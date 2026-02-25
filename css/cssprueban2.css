@@ -1,0 +1,244 @@
+.bg-subtitulo {
+    background-color: #F0F8FF; /* Color de fondo para subtítulos */
+}
+
+.bg-titulo {
+    background-color: #87CEFA; /* Color de fondo para títulos */
+}
+
+.bg-total {
+    background-color: #90EE90; /* Color de fondo para totales */
+}
+    
+.divOculto {
+  display: none;
+}
+ 
+:-moz-placeholder {
+    color: #ccc;
+}
+ 
+::-webkit-input-placeholder {
+   color: #ccc;
+   opacity: 1 
+}
+.fondo-rojo {
+    background-color: red;
+}
+	
+*:focus {outline: none;}
+
+body {font: 12px/21px "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", sans-serif;
+   
+}
+
+
+
+.contact_form h2, .contact_form label {font-family "segoe-ui", "open-sans";}
+.form_hint, .required_notification {font-size: 11px;}
+    
+.contact_form ul {
+    width:auto;
+    list-style-type:none;
+    list-style-position:outside;
+    margin:0px;
+    padding:30px;
+
+}
+.contact_form li{
+    padding:3px; 
+    border-bottom:1px solid #eee;
+    border-right: 0;
+    position:relative;
+        height:auto;
+    
+
+}
+#listh{
+    
+         background: linear-gradient(#D9D9DD,#E9EAEB);
+         color:darkblue;
+      
+}
+.contact_form li:first-child, .contact_form li:last-child {
+    border-bottom:1px solid #eee;
+}
+.contact_form h3 {
+    margin:0;
+    display: inline;
+   
+    color: darkblue;
+}
+h3{
+    color:darkblue;
+    font-size: 24px;
+}
+.required_notification {
+    color:#d45252; 
+    margin:5px 0 0 0; 
+    display:inline;
+    float:right;
+}
+.contact_form label {
+    width:220px;
+    margin-top: 3px;
+    display:inline-block;
+    float:left;
+    text-align: right;
+    padding:1px;
+     height:5px;
+}
+select {
+    height:25px; 
+    /*width:200px; */
+    padding:3px 8px;
+    
+}
+
+.contact_form input {
+    height:25px; 
+    width:auto; 
+    padding:3px 8px;
+    
+}
+.contact_form textarea {padding:3px; width:380px;height: 40px;}
+.contact_form button {margin-left:156px;}
+
+.contact_form input, .contact_form textarea { 
+    border:1px solid #aaa;
+    box-shadow: 0px 0px 3px #ccc, 0 10px 15px #eee inset;
+    border-radius:2px;
+}
+.contact_form input:focus, .contact_form textarea:focus {
+    background: #fff; 
+    border:1px solid #555; 
+    box-shadow: 0 0 3px #aaa; 
+}
+/* Button Style */
+button.submit {
+    background-color: #0B2D7A;
+    background: -webkit-gradient(linear, left top, left bottom, from(#0B2D7A), to(#0B2D7A));
+    background: -webkit-linear-gradient(top, #0B2D7A, #0B2D7A);
+    background: -moz-linear-gradient(top, #0B2D7A, #92B8D8);
+    background: -ms-linear-gradient(top, #0B2D7A, #92B8D8);
+    background: -o-linear-gradient(top, #0B2D7A, #92B8D8);
+    background: linear-gradient(top, #68b12f, #50911e);
+    border: 1px solid #0B2D7A;
+    border-bottom: 1px solid #0B2D7A;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    box-shadow: inset 0 1px 0 0 #0B2D7A;
+    -webkit-box-shadow: 0 1px 0 0 #0B2D7A inset ;
+    -moz-box-shadow: 0 1px 0 0 #0B2D7A inset;
+    -ms-box-shadow: 0 1px 0 0 #0B2D7A inset;
+    -o-box-shadow: 0 1px 0 0 #0B2D7A inset;
+    color: white;
+    font-weight: bold;
+    padding: 6px 20px;
+    text-align: center;
+    text-shadow: 0 -1px 0 #396715;
+}
+button.submit:hover {
+    opacity:.85;
+    cursor: pointer; 
+}
+button.submit:active {
+    border: 1px solid #20911e;
+    box-shadow: 0 0 10px 5px #0B2D7A inset; 
+    -webkit-box-shadow:0 0 10px 5px #0B2D7A inset ;
+    -moz-box-shadow: 0 0 10px 5px #0B2D7A inset;
+    -ms-box-shadow: 0 0 10px 5px #92B8D8 inset;
+    -o-box-shadow: 0 0 10px 5px #92B8D8 inset;
+     
+}
+
+
+.contact_form input:focus, .contact_form textarea:focus { /* add this to the already existing style */
+    padding-right:70px;
+}
+
+.contact_form input, .contact_form textarea { /* add this to the already existing style */
+    -moz-transition: padding .25s; 
+    -webkit-transition: padding .25s; 
+    -o-transition: padding .25s;
+    transition: padding .25s;
+}
+
+
+
+.contact_form input, .contact_form textarea {
+    padding-right:50px;
+}
+
+.contact_form input, .contact_form textarea {
+    padding-right:30px;
+}
+
+input:required, textarea:required {
+    background: #fff url(images/red_asterisk.png) no-repeat 98% center;
+}
+::-webkit-validation-bubble-message {
+    padding: 1em;
+}
+
+.contact_form input:focus:invalid, .contact_form textarea:focus:invalid { /* when a field is considered invalid by the browser */
+    background: #fff url(images/invalid.png) no-repeat 98% center;
+    box-shadow: 0 0 5px #d45252;
+    border-color: #b03535
+}
+
+.contact_form input:required:valid, .contact_form textarea:required:valid { /* when a field is considered valid by the browser */
+    background: #fff url(images/valid.png) no-repeat 98% center;
+  
+ 
+}
+.bg-customb {
+    background-color: #abcdef; /* Reemplaza #abcdef con tu código hexadecimal */
+    background-color: #abcdef; /* Reemplaza #abcdef con tu código hexadecimal */
+}
+button.cancel {
+    background-color: #0B2D7A;
+    background: -webkit-gradient(linear, left top, left bottom, from(#0B2D7A), to(#0B2D7A));
+    background: -webkit-linear-gradient(top, #0B2D7A, #0B2D7A);
+    background: -moz-linear-gradient(top, #0B2D7A, #92B8D8);
+    background: -ms-linear-gradient(top, #0B2D7A, #92B8D8);
+    background: -o-linear-gradient(top, #0B2D7A, #92B8D8);
+    background: linear-gradient(top, #68b12f, #50911e);
+    border: 1px solid #0B2D7A;
+    border-bottom: 1px solid #0B2D7A;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    box-shadow: inset 0 1px 0 0 #0B2D7A;
+    -webkit-box-shadow: 0 1px 0 0 #0B2D7A inset ;
+    -moz-box-shadow: 0 1px 0 0 #0B2D7A inset;
+    -ms-box-shadow: 0 1px 0 0 #0B2D7A inset;
+    -o-box-shadow: 0 1px 0 0 #0B2D7A inset;
+    color: white;
+    font-weight: bold;
+    padding: 6px 20px;
+    text-align: center;
+    text-shadow: 0 -1px 0 #396715;
+}
+button.cancel:hover {
+    opacity:.85;
+    cursor: pointer; 
+}
+button.cancel:active {
+    border: 1px solid #20911e;
+    box-shadow: 0 0 10px 5px #0B2D7A inset; 
+    -webkit-box-shadow:0 0 10px 5px #0B2D7A inset ;
+    -moz-box-shadow: 0 0 10px 5px #0B2D7A inset;
+    -ms-box-shadow: 0 0 10px 5px #92B8D8 inset;
+    -o-box-shadow: 0 0 10px 5px #92B8D8 inset;
+     
+}
+.bg-lighter {
+    background-color: #f8f9fa; /* Un tono de gris más claro */
+    /* Otros estilos personalizados */
+}

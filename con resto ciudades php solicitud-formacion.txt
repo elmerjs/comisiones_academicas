@@ -1,0 +1,470 @@
+<?php
+require 'conn.php';
+require('include/header.php');
+
+if(isset($_GET['id'])) {
+    // Obtener el valor de la variable "id"
+    $doc = $_GET['id'];
+
+    // Consultar la base de datos para obtener los detalles del profesor y sus relaciones
+    $query = "SELECT t.documento_tercero, t.nombre_completo, d.depto_nom_propio, f.nombre_fac_min, t.CARGO_ADMIN
+              FROM tercero t
+              LEFT JOIN deparmanentos d ON t.fk_depto = d.PK_DEPTO
+              LEFT JOIN facultad f ON d.FK_FAC = f.PK_FAC
+              WHERE t.documento_tercero = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $doc);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $profesor = $result->fetch_assoc();
+
+    if (!$profesor) {
+        echo "No se encontraron datos para el documento proporcionado.";
+        exit();
+    }
+} else {
+    // Si no se recibió el parámetro "id" en la URL
+    echo "No se proporcionó un ID válido.";
+    exit();
+}
+
+
+// Consulta para obtener los nombres de los rectores
+$rectores_query = "SELECT CC, NOMBRE FROM rector ORDER BY NOMBRE ASC";
+$rectores_result = $conn->query($rectores_query);
+
+
+// Consulta para obtener los nombres de los vcrectores
+$vicerrectores_query = "SELECT CC, NOMBRE FROM vicerrector ORDER BY NOMBRE ASC";
+$vicerrectores_result = $conn->query($vicerrectores_query);
+
+// Consulta para obtener los nombres de los usaurios 
+$user_query = "SELECT name FROM users ORDER BY name ASC";
+$user_result = $conn->query($user_query);
+
+
+
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario con Autocompletar</title>
+    <!-- Incluir jQuery -->
+ <!-- Incluir jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Incluir jQuery UI -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<!-- Incluir jQuery UI CSS -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+<body>
+<br><br>
+<div class="container">
+    <h4 class="my-4">Solicitud de Formación</h4>
+    <form action="nueva_solicitud_formacion.php" method="post">
+        <div class="row mb-3">
+            <div class="col-md-2">
+                <label for="numero">CC:</label>
+                <input type="text" class="form-control" id="numero" name="numero" value="<?= $profesor['documento_tercero'] ?>" readonly>
+            </div>
+            <div class="col-md-4">
+                <label for="nombre">Nombre del Profesor:</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="<?= $profesor['nombre_completo'] ?>" readonly>
+            </div>
+            <div class="col-md-3">
+                <label for="depto">Departamento:</label>
+                <input type="text" class="form-control" id="depto" name="depto" value="<?= $profesor['depto_nom_propio'] ?>" readonly>
+            </div>
+            <div class="col-md-3">
+                <label for="facultad">Facultad:</label>
+                <input type="text" class="form-control" id="facultad" name="facultad" value="<?= $profesor['nombre_fac_min'] ?>" readonly>
+            </div>
+        </div>
+        
+           <div class="row mb-3">
+           
+            <div class="col-md-3">
+                <label for="No_resolucion">No. Resolución:</label>
+                <input type="text" class="form-control" id="No_resolucion" name="No_resolucion" required>
+            </div>
+                <div class="col-md-3">
+                <label for="fecha_resolucion">Fecha Resolución:</label>
+                <input type="date" class="form-control" id="fecha_resolucion" name="fecha_resolucion" required>
+            </div>
+   
+            <div class="col-md-3">
+                <label for="tipo_estudio">Comisión:INT/EXT</label>
+                <select class="form-control" id="tipo_estudio" name="tipo_estudio" onchange="handleTipoEstudioChange()">
+                    <option value="INT">Interior</option>
+                    <option value="EXT">Exterior</option>
+                </select>
+            </div>
+               <div class="col-md-3">
+                <label for="tipo_participacion">PARTICIPANTE/PONENTE:</label>
+                <select class="form-control" id="tipo_participacion" name="tipo_participacion" required>
+                    <option value="Participante">Participante</option>
+                    <option value="Ponente">Ponente</option>
+                </select>
+            </div>  
+        </div>
+
+ 
+           <div class="row mb-3">
+          <div class="col-md-3">
+                <label for="pais">País:</label>
+                <input type="text" class="form-control" id="pais" name="pais" required>
+            </div>
+            <div class="col-md-3">
+                <label for="ciudad">Ciudad:</label>
+                <input type="text" class="form-control" id="ciudad" name="ciudad" required>
+            </div>
+   <div class="col-md-2">
+                <label for="fecha_inicio">Fecha de Inicio:</label>
+                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+            </div>
+            <div class="col-md-2">
+                <label for="fecha_fin">Fecha de Fin:</label>
+                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+            </div>
+            <div class="col-md-2">
+                <label for="fecha_aval">Fecha Aval:</label>
+                <input type="date" class="form-control" id="fecha_aval" name="fecha_aval">
+            </div>
+              
+               
+        </div>
+    
+            <div class="row mb-3">
+            <div class="col-md-3">
+                <label for="evento">Evento:</label>
+                <textarea class="form-control" id="evento" name="evento" required></textarea>
+            </div>
+            <div class="col-md-3">
+                <label for="organizado_por">Organizado Por:</label>
+                <textarea type="text" class="form-control" id="organizado_por" name="organizado_por"></textarea>
+            </div>
+                   <div class="col-md-3">
+                <label for="nombre_trabajo">Nombre del Trabajo:</label>
+                <textarea type="text" class="form-control" id="nombre_trabajo" name="nombre_trabajo"></textarea>
+            </div>
+                        <div class="col-md-3">
+                <label for="justificacion">Justificación:</label>
+                <textarea class="form-control" id="justificacion" name="justificacion"></textarea>
+            </div>
+         
+        </div>
+     
+        <div class="row mb-3">
+               <div class="col-md-3">
+                <label for="duracion_horas">Duración Horas:</label>
+                <input type="number" step="0.01" class="form-control" id="duracion_horas" name="duracion_horas">
+            </div>
+
+             <div class="col-md-3">
+                <label for="vigencia">Vigencia:</label>
+                <select class="form-control" id="vigencia" name="vigencia" required>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="periodo">Periodo:</label>
+                <select class="form-control" id="periodo" name="periodo" required>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+             <div class="col-md-3">
+                <label for="estado">Estado:</label>
+                <select class="form-control" id="estado" name="estado" required>
+                    <option value="activa">Activa</option>
+                    <option value="finalizada">Finalizada</option>
+                    <option value="anulada">Anulada</option>
+                </select>
+            </div>
+
+        </div>
+           
+
+     <br>
+          <div class="bordered-section mb-3">
+            <div class="section-label">Presupuesto</div>
+        
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="viaticos">Viáticos:</label>
+                <input type="checkbox" id="viaticos" name="viaticos" value="1" onclick="handleViaticosChange()">
+            </div>
+            <div class="col-md-4">
+                <label for="tiquetes">Tiquetes:</label>
+                <input type="checkbox" id="tiquetes" name="tiquetes" value="1" onclick="handleViaticosChange()">
+            </div>
+            <div class="col-md-4">
+                <label for="inscripcion">Inscripción:</label>
+                <input type="checkbox" id="inscripcion" name="inscripcion" value="1" onclick="handleViaticosChange()">
+            </div>
+        </div>
+        <div id="cargoFields" class="row mb-3" style="display: none;">
+            <div class="col-md-6">
+                <label for="cargo_a">Cargo A:</label>
+                <input type="text" class="form-control" id="cargo_a" name="cargo_a">
+            </div>
+        </div>
+        <div id="adminFields" class="row mb-3" style="display: none;">
+            <div class="col-md-6">
+                <label for="valor">Valor:</label>
+                <input type="number" step="0.01" class="form-control" id="valor" name="valor">
+            </div>
+            <div class="col-md-6">
+                <label for="cdp">CDP:</label>
+                <input type="text" class="form-control" id="cdp" name="cdp">
+            </div>
+        </div>
+               </div>
+         <div class="row mb-3">
+            <div class="col-md-12">
+                <label for="observaciones">Observaciones:</label>
+                <textarea class="form-control" id="observaciones" name="observaciones"></textarea>
+            </div>
+           
+        </div>
+       
+        <div class="row mb-3">
+           <div class="col-md-4">
+                <label for="id_rector">ID Rector:</label>
+                <select class="form-control" id="id_rector" name="id_rector" required>
+                    <?php
+                    while ($rector = $rectores_result->fetch_assoc()) {
+                        echo "<option value=\"" . $rector['CC'] . "\">" . $rector['NOMBRE'] . "</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="id_vice">ID Vice:</label>
+                <select class="form-control" id="id_vice" name="id_vice" required>
+
+                    <?php
+                    while ($vicerrector = $vicerrectores_result->fetch_assoc()) {
+                        echo "<option value=\"" . $vicerrector['CC'] . "\">" . $vicerrector['NOMBRE'] . "</option>";
+                    }
+                    ?>  </select>
+            </div>
+             <div class="col-md-4">
+                <label for="tramito">Tramitó:</label>
+                <select class="form-control" id="tramito" name="tramito" required>
+                    <?php
+                    while ($user = $user_result->fetch_assoc()) {
+                        echo "<option value=\"" . $user['name'] . "\">" . $user['name'] . "</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+        <br>
+           <div class="row mb-3">
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-success btn-block">Enviar</button>
+            </div>
+                        <div class="col-md-3">
+
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+    </div>
+        </div>
+    </form>
+   
+</div>
+    </body>
+<style>
+    .bordered-section {
+        border: 1px solid #ced4da;
+        padding: 15px;
+        position: relative;
+    }
+
+    .section-label {
+        position: absolute;
+        top: -10px;
+        left: 10px;
+        background-color: white;
+        padding: 0 5px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+</style>
+
+    
+    
+    
+    
+    
+    
+    
+<script>
+    $(document).ready(function() {
+        var paises = [
+            // América
+            "Argentina", "Bolivia", "Brasil", "Chile", "Colombia", "Ecuador", "Guyana", "Paraguay", "Perú", "Surinam", "Uruguay", "Venezuela", // América del Sur
+            "Belice", "Costa Rica", "El Salvador", "Guatemala", "Honduras", "Nicaragua", "Panamá", "Canadá", "Estados Unidos", "México", // América Central y Norteamérica
+
+            // Europa
+            "Albania", "Alemania", "Andorra", "Armenia", "Austria", "Azerbaiyán", "Bélgica", "Bielorrusia", "Bosnia y Herzegovina", "Bulgaria", "Croacia", "Chipre", "República Checa", "Dinamarca", "Estonia", "Finlandia", "Francia", "Georgia", "Grecia", "Hungría", "Islandia", "Irlanda", "Italia", "Kosovo", "Letonia", "Liechtenstein", "Lituania", "Luxemburgo", "Malta", "Moldavia", "Mónaco", "Montenegro", "Países Bajos", "Macedonia del Norte", "Noruega", "Polonia", "Portugal", "Rumania", "Rusia", "San Marino", "Serbia", "Eslovaquia", "Eslovenia", "España", "Suecia", "Suiza", "Turquía", "Ucrania", "Reino Unido", "Ciudad del Vaticano",
+
+            // África
+            "Argelia", "Angola", "Benín", "Botsuana", "Burkina Faso", "Burundi", "Cabo Verde", "Camerún", "República Centroafricana", "Chad", "Comoras", "República Democrática del Congo", "Yibuti", "Egipto", "Guinea Ecuatorial", "Eritrea", "Eswatini", "Etiopía", "Gabón", "Gambia", "Ghana", "Guinea", "Guinea-Bisáu", "Costa de Marfil", "Kenia", "Lesoto", "Liberia", "Libia", "Madagascar", "Malaui", "Malí", "Mauritania", "Mauricio", "Marruecos", "Mozambique", "Namibia", "Níger", "Nigeria", "República del Congo", "Ruanda", "Santo Tomé y Príncipe", "Senegal", "Seychelles", "Sierra Leona", "Somalia", "Sudáfrica", "Sudán", "Sudán del Sur", "Tanzania", "Togo", "Túnez", "Uganda", "Zambia", "Zimbabue",
+
+            // Asia
+            "Afganistán", "Arabia Saudita", "Bangladés", "Baréin", "Birmania", "Brunéi", "Bután", "Camboya", "Catar", "China", "Corea del Norte", "Corea del Sur", "Emiratos Árabes Unidos", "Filipinas", "India", "Indonesia", "Irak", "Irán", "Israel", "Japón", "Jordania", "Kazajistán", "Kirguistán", "Kuwait", "Laos", "Líbano", "Malasia", "Maldivas", "Mongolia", "Nepal", "Omán", "Pakistán", "Palaos", "Papúa Nueva Guinea", "Qatar", "Singapur", "Siria", "Sri Lanka", "Tailandia", "Tayikistán", "Timor Oriental", "Turkmenistán", "Turquía", "Uzbekistán", "Vietnam", "Yemen",
+
+            // Oceanía
+            "Australia", "Fiyi", "Islas Marshall", "Islas Salomón", "Kiribati", "Micronesia", "Nauru", "Nueva Zelanda", "Palaos", "Papúa Nueva Guinea", "Samoa", "Tonga", "Tuvalu", "Vanuatu"
+        ];
+
+        $("#pais").autocomplete({
+            source: paises
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        var ciudadesColombia = [
+            // Ciudades principales
+            "Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena", "Cúcuta", "Bucaramanga", "Pereira", "Santa Marta", "Ibagué", "Villavicencio", "Valledupar", "Montería", "Pasto", "Neiva", "Manizales", "Armenia", "Popayán", "Sincelejo", "Tunja", "Riohacha",
+
+            // Municipios destacados por departamento
+            // Amazonas
+            "Leticia", "Puerto Nariño",
+            // Antioquia
+            "Envigado", "Itagüí", "Rionegro", "Sabaneta", "Envigado", "Bello", "Turbo", "Apartadó", "Caucasia", "Yarumal", "Puerto Berrío",
+            // Atlántico
+            "Soledad", "Malambo", "Sabanagrande", "Galapa", "Puerto Colombia", "Baranoa", "Usiacurí", "Tubará", "Luruaco", "Campo de la Cruz",
+            // Bolívar
+            "Soledad", "Malambo", "Sabanagrande", "Galapa", "Puerto Colombia", "Arjona", "Turbaná", "San Estanislao", "Cantagallo", "Regidor",
+            // Boyacá
+            "Sogamoso", "Duitama", "Chiquinquirá", "Tunja", "Paipa", "Tunja", "Chiquinquirá", "Sogamoso", "Soatá", "Sáchica", "Puerto Boyacá",
+            // Caldas
+            "Manizales", "La Dorada", "Chinchiná", "Villamaría", "Pensilvania", "Manzanares", "Aguadas", "Riosucio", "Victoria", "Marquetalia",
+            // Caquetá
+            "Florencia", "San Vicente del Caguán", "Albania", "Morelia", "Solano", "Puerto Rico", "Milán", "Valparaíso", "Belén de los Andaquíes", "Cartagena del Chairá",
+            // Casanare
+            "Yopal", "Villanueva", "Paz de Ariporo", "Tauramena", "Aguazul", "Monterrey", "Támara", "Trinidad", "Recetor", "La Salina",
+            // Cauca
+            "Popayán", "Santander de Quilichao", "Patía", "El Tambo", "La Sierra", "Timbío", "Piendamó", "Puracé", "Páez", "Guapi",
+            // Cesar
+            "Valledupar", "Aguachica", "Agustín Codazzi", "Bosconia", "Chiriguaná", "Pailitas", "González", "Pueblo Bello", "La Gloria", "Astrea",
+            // Chocó
+            "Quibdó", "Bahía Solano", "Nuquí", "Tadó", "Condoto", "Lloró", "Cértegui", "Istmina", "Riosucio", "Medio Baudó",
+            // Córdoba
+            "Montería", "Cereté", "Lorica", "Sahagún", "Tierralta", "Montelíbano", "Chinú", "Ayapel", "San Bernardo del Viento", "Planeta Rica",
+            // Cundinamarca
+            "Soacha", "Facatativá", "Zipaquirá", "Chía", "Girardot", "Madrid", "Funza", "Mosquera", "Cajicá", "La Calera",
+            // Guainía
+            "Inírida", "Barranco Minas", "Mapiripana", "San Felipe", "Pana Pana", "Cacahual", "La Guadalupe", "Cumaribo", "Puerto Colombia", "Puerto Carreño",
+            // Guaviare
+            "San José del Guaviare", "El Retorno", "Miraflores", "Calamar", "La Hormiga", "San José de Guaviare", "El Retorno", "Calamar", "Miraflores", "Cumaribo",
+            // Huila
+            "Neiva", "Pitalito", "Garzón", "La Plata", "Campoalegre", "Algeciras", "Acevedo", "Palermo", "Tello", "Baraya",
+            // La Guajira
+            "Riohacha", "Maicao", "Uribia", "Manaure", "San Juan del Cesar", "Fonseca", "Villanueva", "Barrancas", "Dibulla", "Hatonuevo",
+            // Magdalena
+            "Ciénaga", "Fundación", "El Banco", "Pivijay", "Santa Ana", "Aracataca", "Zona Bananera", "El Retén", "Chibolo", "Guamal",
+            // Meta
+            "Villavicencio", "Acacías", "Granada", "Puerto López", "Puerto Gaitán", "Castilla la Nueva", "La Macarena", "Uribe", "Mesetas", "Lejanías",
+            // Nariño
+            "Tumaco", "Pasto", "Ipiales", "Túquerres", "Pupiales", "Quilcacé", "Taminango", "Leiva", "Samaniego", "El Charco",
+            // Norte de Santander
+            "Cúcuta", "Pamplona", "Ocaña", "Tibú", "El Zulia", "Villa del Rosario", "Los Patios", "Chinácota", "Bochalema", "Puerto Santander",
+            // Putumayo
+            "Mocoa", "Sibundoy", "Puerto Asís", "Orito", "Villagarzón", "Colón", "Puerto Guzmán", "San Francisco", "Valle del Guamuez", "La Hormiga",
+            // Quindío
+            "Armenia", "Calarcá", "Montenegro", "La Tebaida", "Circasia", "Filandia", "Salento", "Córdoba", "Génova", "Puerto Quimbaya",
+// Risaralda
+"Pereira", "Dosquebradas", "La Virginia", "Santa Rosa de Cabal", "Belen de Umbría", "Marsella", "Quinchía", "Guática", "La Celia", "Santuario",
+// San Andrés y Providencia
+"San Andrés", "Providencia",
+// Santander
+"Bucaramanga", "Floridablanca", "Girón", "Piedecuesta", "Barrancabermeja", "San Gil", "Aratoca", "Barichara", "Cimitarra", "Socorro",
+// Sucre
+"Sincelejo", "Corozal", "Santiago de Tolú", "Sincé", "San Marcos", "San Onofre", "Morroa", "Colosó", "Guaranda", "Toluviejo",
+// Tolima
+"Ibagué", "Espinal", "Girardot", "Melgar", "Líbano", "Honda", "Chaparral", "Natagaima", "Purificación", "Cajamarca",
+// Valle del Cauca
+"Cali", "Buenaventura", "Palmira", "Tuluá", "Cartago", "Yumbo", "Buga", "Jamundí", "La Unión", "Dagua",
+// Vaupés
+"Mitú", "Carurú", "Taraira", "Pacoa", "Papunahua", "Yavaraté", "Mitu",
+// Vichada
+"Puerto Carreño","Cumaribo", "Santa Rosalía", "La Primavera", "Santa Rita", "La Guadalupe", "Cumaribo","Nueva York","Los Ángeles","Chicago","Houston","Phoenix","Filadelfia","San Antonio","San Diego","Dallas","San José","Austin","Jacksonville","Fort Worth","Columbus","San Francisco","Charlotte","Indianápolis","Seattle","Denver","Washington","Boston","El Paso","Detroit","Nashville","Portland","Memphis","Oklahoma City","Las Vegas","Louisville","Baltimore","Milwaukee","Albuquerque","Tucson","Fresno","Sacramento","Mesa","Kansas City",
+"Atlanta","Colorado Springs","Virginia Beach","Omaha","Raleigh","Miami","Oakland","Minneapolis","Tampa","Tulsa","Wichita","New Orleans","Arlington","Bakersfield","Aurora","Cleveland","Anaheim","Honolulu","Riverside","Santa Ana","Corpus Christi","Lexington","Stockton","Saint Paul","Anchorage","Newark","Plano","Buffalo","Henderson","Fort Wayne","Greensboro","Lincoln","Glendale","Chandler","Scottsdale","St. Petersburg","Jersey City","Madison","Orlando","Norfolk","Durham","Laredo","Chula Vista","Winston-Salem","Garland","Irving","Tacoma","Shreveport","Fontana","Oxnard","Aurora","Moreno Valley","Akron","Yonkers","Huntington Beach","Little Rock","Amarillo","Glendale","Mobile","Grand Rapids","Salt Lake City","Tallahassee","Huntsville","Worcester","Knoxville","Grand Prairie","Newport News","Brownsville","Overland Park","Santa Clarita","Provo","Jackson","Salem","Augusta","Oceanside","Cary","Fort Lauderdale","Chattanooga","Tempe","Rancho Cucamonga","Frisco","Ontario","Vancouver","Springfield","Santa Rosa","Pembroke Pines","Cape Coral","Elk Grove","Salem","Salinas","Springfield","Pasadena","Macon","Alexandria","Pomona","Lakewood","Sunnyvale","Escondido",
+"Kansas City","Hollywood","Pasadena","Naperville","Joliet","Bellevue","Rockford","Savannah","Paterson","Torrance","Bridgeport","McAllen","Mesquite","Syracuse","Midland","Pasadena","Murfreesboro","Miramar","Dayton","Fullerton","Olathe","Orange","Thornton","Roseville","Denton","Waco","Surprise","Charleston","Beaumont","Independence","Victorville","Berkeley","Allentown","Richardson","Arvada","Ann Arbor","Las Cruces","Columbia","Abilene","Sugar Land","Evansville","Gainesville","Simi Valley","Vallejo","Ann Arbor","Carrollton","Athens","Inglewood","West Valley City","Manchester","High Point","Norwalk","Richardson","Broken Arrow","Antioch","Centennial","Temecula","Everett","Elgin","Rialto","San Buenaventura","Pueblo","Pearland","Visalia","Boulder","Charleston","Green Bay","Lakewood","Tyler","West Covina","Wichita Falls","San Mateo","El Cajon","Lewisville","Burbank","League City","Rialto","Daly City","Allen","Sparks","Renton","Vista","Davenport","Tuscaloosa","Clinton","Edison","Woodbridge","San Angelo","Kenosha","Vacaville","Carson City","Melbourne","Clovis","Santa Maria","Greeley","Cambridge","Brockton","Albany","Westminster","Sparks","Livonia","Cranston","Johns Creek","South Gate","Largo","Gardena","Hemet","Lexington","Dothan","Waukegan","Niagara Falls","North Charleston","Youngstown","Orem","Lynchburg","Palm Bay","Reading","Lowell","Nampa","St. Charles","Boca Raton","Livermore","Ogden","Camarillo","Eagan","Palm Coast","Sugar Land","Danbury","Mount Pleasant","Warner Robins","Johnson City","Warwick","Bolingbrook","Bethlehem","Quincy","Perris","Eden Prairie","Schaumburg","Westminster","Jurupa Valley","Menifee","Kirkland","East Orange","West Haven","Lawrence","Taylor","Roseville","Clifton","San Marcos","Margate","St. Joseph","Lauderhill","East Providence","Port Orange","Pittsburg","Broomfield","Folsom","Brentwood","Everett","Wheaton","Anderson","Peabody","Des Plaines","Huntsville","Cherry Hill","Homestead","Troy","Battle Creek","Paramount","Cathedral City","Hoboken","Hackensack","Galveston","Lancaster","Commerce City","Lynwood","Grand Forks","Greenwood","Bellevue","Clovis","Dearborn Heights","Plainfield","Hackensack","Sayreville","Bellflower","Royal Oak","North Bergen","Burnsville","Tigard","Des Moines","Woodland","Utica","Gaithersburg","Schenectady","Minnetonka","Mount Vernon","Wausau","Brookhaven","Sheboygan","West Allis","North Miami","Maple Grove","Novi","Ceres","Colton","La Mirada","Palm Desert","Albany","La Quinta","Oak Lawn","Lakewood","Collierville","Saginaw","Kokomo","Maplewood","Grand Island","Alameda","Titusville","Lakeville","Brentwood","Enid","Leesburg","Sammamish","Lake Forest","New Braunfels","Pinellas Park","Dubuque","Lake Havasu City","Leominster","Palm Beach Gardens","Westfield","Bullhead City","Melbourne","Twin Falls","Beloit","Spanish Fork","Coachella","North Little Rock","San Luis Obispo","Apex","Joplin","Sanford","Cathedral City","Muskegon","Rock Hill","St. Louis Park","Brookfield","Coral Gables","Olympia","Cedar Hill","Euclid","Hobbs","La Mesa","Texas City","Bossier City","Barnstable","Hattiesburg","Wheeling","Grants Pass","Aventura","Logan","Lafayette","Linden","Hesperia","Keller","Monterey Park","Bullhead City","Lake Elsinore","Claremont","Merrillville","Rancho Palos Verdes","Texarkana","Roswell","La Puente","Montebello","Maricopa","Prescott Valley","Pinellas Park","Bullhead City","Bartlett","Belleville",
+"Richland","West Sacramento","Santee","Little Elm","Calexico","Rancho Santa Margarita","Stillwater","Olympia","Panama City","Hoboken","Battle Creek","Grove City","Bonita Springs","Puyallup","Strongsville","Apopka","Porterville","Edina","Olympia","Cupertino","Elyria","Watsonville","Gilroy","Manteca","Spartanburg","Kingsport","Lake Oswego","Euless","Poway","Yucaipa","Orland Park","Georgetown","Dublin","Wheaton","Lincoln Park","Roseville","Perth Amboy","La Porte","Cuyahoga Falls","Rockwall","Berwyn","Belleville","Peabody","Mishawaka","Middletown","Bradenton","Maplewood","Pinellas Park","Baytown","Redmond","Cupertino","Joplin","Conroe","Twin Falls","North Miami Beach","Harlingen","Lorain","Owensboro","Union City","Great Falls","Tigard","Ceres","Bossier City","Castle Rock","Florence","Keller","Georgetown","Plainfield","Poway","Mentor","Cuyahoga Falls","Bryan","Gresham","Shawnee","Roswell","Sumter","Bell Gardens","San Marcos","Mount Prospect","Diamond Bar","Montebello","Commerce City","Bonita Springs","Pontiac","Apopka","Murray","Lehi","Weymouth","Parker","San Rafael","Hattiesburg","Bismarck","Chelsea","Texarkana","Cerritos","Hattiesburg","Caldwell","Twin Falls","Dublin","Watsonville","Haltom City","Coeur d'Alene","Eagan","Stillwater","Campbell","Belleville","El Centro","Kannapolis","Logan","Dunedin","Hurst","Wilson","Urbandale","Concord","Greenwood","Oswego","Burlington","Petaluma","Rockwall","Pocatello","Delano","Madison","Kissimmee","Bellevue","Lombard","Crystal Lake","Grand Forks","Hutchinson","La Mesa","Noblesville","Placentia","Parker","Harrisburg","Hilton Head Island","Everett","Upland","Logan","Ceres","Mankato","Sheboygan","DeKalb","Woonsocket","Lancaster","Niagara Falls","Hanford","Elkhart","Ormond Beach","Sammamish","Goodyear","San Luis Obispo","Bismarck","Enid","Coachella","Pico Rivera","Edina","West Sacramento","Linden","Yorba Linda","Muskogee","Hoffman Estates","Summerville","San Ramon","Westerville","Mishawaka","Florence","Moore","Sanford","Arcadia","Moore","Eden Prairie","Placentia","Brookfield","Roseville","Maplewood","Valdosta","Minot","Campbell","Crystal Lake","Valdosta","Cupertino","Castle Rock","Sumter","Bellflower","St. Charles","Prescott Valley","Manhattan Beach","Summerville","Wauwatosa","Twin Falls","Paramount","Cupertino","Poway","Euclid","Linden","West New York","North Richland Hills","Hagerstown","Palm Desert","La Porte","Auburn","Maple Grove","Oak Park","Arcadia","Holyoke","Cerritos","Fitchburg","Calexico","La Puente","Parker","Springfield","Hanover Park","Elkhart","Orland Park","Rosemead","Bradenton","Manhattan Beach","Bellevue","Ormond Beach","Wauwatosa","Manassas","Prescott Valley","White Plains","North Lauderdale","La Mirada",
+"Barcelona",
+"West New York","Woonsocket","Yorba Linda","Placentia","Cerritos","Wauwatosa","Fountain Valley","La Puente","Parker","Bradenton","Hanover Park","Westerville","Burlington","Weymouth","Crystal Lake","New Brunswick","Elmhurst","Lodi","Auburn","West Haven","Portage","Petaluma","Pico Rivera","Bowling Green","Coachella","Southaven","Fitchburg",
+"Calexico","La Mirada","Novi","Oak Park","Bartlett","Arcadia","Ormond Beach","Galveston","Hutchinson","Moore","Upland","Anderson","Pico Rivera","Southaven","New Brunswick","Waterloo","Joplin","New Rochelle","Bradenton","Sao Pablo"]; $("#ciudad").autocomplete({
+        source: ciudadesColombia
+    });
+});</script>
+
+
+<script>
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    function handleTipoEstudioChange() {
+        var tipoEstudio = document.getElementById("tipo_estudio").value;
+        var paisSelect = document.getElementById("pais");
+        if (tipoEstudio === "INT") {
+            paisSelect.value = "Colombia";
+           // paisSelect.disabled = true;
+        } else {
+            paisSelect.disabled = false;
+        }
+        handlePaisChange();
+    }
+    
+    
+    
+    
+    
+    
+
+
+   function handleViaticosChange() {
+        var viaticosChecked = document.getElementById("viaticos").checked;
+        var tiquetesChecked = document.getElementById("tiquetes").checked;
+        var inscripcionChecked = document.getElementById("inscripcion").checked;
+        var cargoFields = document.getElementById("cargoFields");
+        var adminFields = document.getElementById("adminFields");
+        var cargoAdmin = "<?= $profesor['CARGO_ADMIN'] ?>";
+
+        if (viaticosChecked || tiquetesChecked || inscripcionChecked) {
+            cargoFields.style.display = "block";
+            if (["JEFE", "DECANO", "DIRECTOR"].includes(cargoAdmin)) {
+                adminFields.style.display = "block";
+            }
+        } else {
+            cargoFields.style.display = "none";
+            adminFields.style.display = "none";
+        }
+    }
+    document.getElementById("tipo_estudio").addEventListener("change", handleTipoEstudioChange);
+    document.getElementById("pais").addEventListener("change", handlePaisChange);
+    document.getElementById("viaticos").addEventListener("change", handleViaticosChange);
+    document.getElementById("tiquetes").addEventListener("change", handleViaticosChange);
+    document.getElementById("inscripcion").addEventListener("change", handleViaticosChange);
+
+    handleTipoEstudioChange(); // Inicializar estado de campos
+    handleViaticosChange(); // Inicializar estado de campos
+});
+</script>
+
+<?php
+//require('include/footer.php');
+?>

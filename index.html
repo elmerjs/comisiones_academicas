@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Unicauca Login</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+      <style>
+      html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}/* custom.css */
+
+.loginBox, .unicauca-card { /* Asumo que ambas clases se usan para la misma caja */
+    /* Mantén tus estilos actuales: */
+    border-radius: 10px;
+    background-color: #ffffff;
+    padding: 40px; /* Suficiente padding interno */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    
+    /* Nuevos o ajustados para mejor UX y ancho: */
+    max-width: 420px; /* Limita el ancho máximo para que no se estire demasiado */
+    width: 90%; /* Asegura que ocupe casi todo el ancho en pantallas pequeñas */
+    margin: 30px auto; /* Centra la caja horizontalmente si no estás usando mx-auto en la columna y añade margen vertical */
+    padding: 30px; /* Un poco menos de padding si 40px es mucho */
+}
+
+/* Ajuste específico para el título si lo ves muy grande en la caja */
+.unicauca-title {
+    font-size: 1.8rem; /* Ligeramente más pequeño para mejor balance */
+    margin-bottom: 25px; /* Espacio debajo del título */
+}
+
+/* Ajuste para el logo */
+.unicauca-logo {
+    max-width: 150px; /* Un poco más pequeño si se ve muy dominante */
+    margin-bottom: 20px; /* Espacio debajo del logo */
+}
+      </style>
+  </head>
+
+  <body>
+    <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 unicauca-bg">
+      <div class="row w-100">
+        <div class="col-lg-6 col-md-8 col-sm-10 mx-auto">
+          <div class="card loginBox unicauca-card shadow-lg">
+            <div class="card-body">
+              <div class="text-center mb-4">
+                <img src="images/logounicauca.png" class="img-fluid unicauca-logo" alt="Unicauca Logo">
+                <h2 class="card-title unicauca-title mt-3">Iniciar Sesión</h2>
+              </div>
+
+              <form action="check-login.php" method="post">
+                <div class="form-group mb-3">
+                  <input type="email" class="form-control form-control-lg unicauca-input" name="email" placeholder="Correo Electrónico" required>
+                </div>
+                <div class="form-group mb-4">
+                  <input type="password" class="form-control form-control-lg unicauca-input" name="password" placeholder="Contraseña" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block unicauca-btn">Ingresar</button>
+              </form>
+
+              <div class="text-center mt-3">
+                <p class="mb-2"><a href="#showForm" data-toggle="collapse" aria-expanded="false" aria-controls="collapse" class="unicauca-link">¿Olvidaste tu contraseña?</a></p>
+                <div class="collapse" id="showForm">
+                  <div class="well">
+                    <a href="password-change.php" class="btn btn-dark btn-sm unicauca-link-btn">Cambiar Contraseña</a>
+                  </div>
+                </div>
+                <hr class="unicauca-hr">
+                <p class="mb-0">¿Nuevo usuario? <a href="indexb.html" title="Create an account" class="unicauca-link">Crear cuenta</a>.</p>
+              </div>
+            </div>
+          </div></div></div></div><script src="js/jquery-3.3.1.slim.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+  </body>
+</html>
