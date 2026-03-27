@@ -41,7 +41,7 @@ $vicerrectores_result = $conn->query($vicerrectores_query);
 // Consulta para obtener los nombres de los usaurios 
 $user_query = "SELECT name FROM users ORDER BY name ASC";
 $user_result = $conn->query($user_query);
-$revisa_query = "SELECT revisa_nom_propio FROM revisa ORDER BY revisa_nom_propio desc";
+$revisa_query = "SELECT revisa_nom_propio FROM revisa WHERE revisa_cc != 888 ORDER BY revisa_nom_propio DESC";
 $revisa_result = $conn->query($revisa_query);
 
 

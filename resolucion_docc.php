@@ -594,17 +594,22 @@ $textRun->addText('", organizado por ' . $organizado_por . ', ' . $endestinos . 
 
 
 $textRun = $section->addTextRun($paragraphStyle);
-$textRun->addText('En cumplimiento del deber de generar y socializar la ciencia, la cultura en la docencia, la investigación y la proyección social como fines misionales universitarios, de conformidad con lo establecido en el artículo 117 del Acuerdo Superior 024 de 1993, '.$nombrarvicel.'encuentra justificada la autorización de la comisión académica en el territorio nacional ' . obtenerFechasFormateadas($fechainicio1, $fechafin1) . ', para ',array('size' => 12));
-$textRun->addText($saludo_el_la,array('size' => 12));
-$textRun->addText(' ' . $nombre_profesor, array('bold' => true,'size' => 12));
-$textRun->addText('.',array('size' => 12));
-$leftParagraphStyle = array('alignment' => Jc::LEFT, 'spaceAfter' => 150);
+$textRun->addText('En cumplimiento del deber de generar y socializar la ciencia, la cultura en la docencia, la investigación y la proyección social como fines misionales universitarios, de conformidad con lo establecido en el artículo 117 del Acuerdo Superior 024 de 1993, '.$nombrarvicel.'encuentra justificada la autorización de la comisión académica en el territorio nacional ' . obtenerFechasFormateadas($fechainicio1, $fechafin1) . ', para ', array('size' => 12));
+$textRun->addText($saludo_el_la, array('size' => 12));
+$textRun->addText(' ' . $nombre_profesor, array('bold' => true, 'size' => 12));
+$textRun->addText('.', array('size' => 12));
+
+// --- NUEVO PÁRRAFO INCLUIDO ---
+// Estilo para el párrafo intermedio (Justificado)
+$justifyStyle = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH, 'spaceAfter' => 100);
+$textRun = $section->addTextRun($justifyStyle);
+$textRun->addText('Que la presente comisión académica se tramita con fundamento en la solicitud presentada por el docente mediante el formato correspondiente, debidamente avalado por el Consejo de Facultad, con base en la información y documentación aportados como soporte de la misma, los cuales se presumen auténticos y veraces en virtud del principio de buena fe que rige las actuaciones administrativas, limitándose esta dependencia a la revisión y análisis de la solicitud conforme a los documentos aportados.', array('size' => 12));
+
+// --- SALTO MÍNIMO Y FRASE FINAL ---
+// El 'spaceBefore' crea el salto mínimo antes de "En mérito de lo expuesto,"
+$leftParagraphStyle = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::LEFT, 'spaceBefore' => 150, 'spaceAfter' => 150);
 $textRun = $section->addTextRun($leftParagraphStyle);
-
-// Añadir el texto "Por lo expuesto," con tamaño 12
 $textRun->addText('En mérito de lo expuesto,', array('size' => 12));
- 
-
 
 // Añadir el título centrado
 $section->addText('RESUELVE:', array('bold' => true, 'size' => 12), array('alignment' => Jc::CENTER));   

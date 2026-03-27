@@ -68,8 +68,7 @@ $consultares = "SELECT
     fecha_informe,
     folios,
     comision_academica.reviso,
-        comision_academica.modalidad,
-
+    comision_academica.modalidad,
     id_rector,
     id_vice,
     justificacion,
@@ -114,18 +113,31 @@ $consultares = "SELECT
     vicerrector.vice_nom_propio AS nom_propio_vice,
     revisa.revisa_nom_propio as nom_revisa,
     vicerrector.tipo_vice AS tipo_vice,
-
     users.Id AS id_user,
     users.DocUsuario,
     users.Name,
     users.Email AS email_usuario,
+    
+    -- Lógica de destinos con paréntesis
     CASE
-        WHEN subquery.num_paises = 1 AND subquery.num_destinos = 2 THEN CONCAT(GROUP_CONCAT(destino.ciudad ORDER BY destino.pais SEPARATOR ' y '), ' - ', MIN(destino.pais))
-        WHEN subquery.num_paises = 1 THEN CONCAT(GROUP_CONCAT(destino.ciudad ORDER BY destino.pais SEPARATOR ', '), ' - ', MIN(destino.pais))
-        WHEN subquery.num_paises > 1 AND subquery.num_destinos = 2 THEN GROUP_CONCAT(destino.id_ciudad_pais ORDER BY destino.pais SEPARATOR ' y ')
-        ELSE GROUP_CONCAT(destino.id_ciudad_pais ORDER BY destino.pais SEPARATOR ', ')
+        -- Mismo país, 2 ciudades: Ciudad A y Ciudad B (País)
+        WHEN subquery.num_paises = 1 AND subquery.num_destinos = 2 THEN 
+            CONCAT(GROUP_CONCAT(destino.ciudad ORDER BY destino.ciudad SEPARATOR ' y '), ' (', MIN(destino.pais), ')')
+        
+        -- Mismo país, 1 o más de 2 ciudades: Ciudad A, Ciudad B, Ciudad C (País)
+        WHEN subquery.num_paises = 1 THEN 
+            CONCAT(GROUP_CONCAT(destino.ciudad ORDER BY destino.ciudad SEPARATOR ', '), ' (', MIN(destino.pais), ')')
+        
+        -- Diferentes países, 2 destinos: Ciudad A (País A) y Ciudad B (País B)
+        WHEN subquery.num_paises > 1 AND subquery.num_destinos = 2 THEN 
+            GROUP_CONCAT(CONCAT(destino.ciudad, ' (', destino.pais, ')') ORDER BY destino.pais SEPARATOR ' y ')
+        
+        -- Diferentes países, múltiples destinos: Ciudad A (País A), Ciudad B (País B)...
+        ELSE 
+            GROUP_CONCAT(CONCAT(destino.ciudad, ' (', destino.pais, ')') ORDER BY destino.pais SEPARATOR ', ')
     END AS destinos,
     subquery.num_destinos
+
 FROM comision_academica
 JOIN tercero ON comision_academica.documento = tercero.documento_tercero
 JOIN deparmanentos ON deparmanentos.PK_DEPTO = tercero.fk_depto
@@ -134,7 +146,6 @@ JOIN destino ON destino.id_comision = comision_academica.id
 LEFT JOIN rector ON rector.rector_cc = comision_academica.id_rector
 LEFT JOIN vicerrector ON vicerrector.vice_cc = comision_academica.id_vice
 LEFT JOIN revisa ON revisa.revisa_nom_propio = comision_academica.reviso
-
 LEFT JOIN users ON users.Name = comision_academica.tramito
 LEFT JOIN (
     SELECT 
@@ -619,14 +630,21 @@ $textRun->addText(', organizado por ' . $organizado_por . ', ' . $endestinos . $
 
 // Añadir el nuevo párrafo
 $textRun = $section->addTextRun($paragraphStyle);
-$textRun->addText('En cumplimiento del deber de generar y socializar la ciencia, la cultura en la docencia, la investigación y  la proyección social como fines misionales universitarios, se justifica la autorización de una comisión académica, ' . obtenerFechasFormateadas($fechainicio1, $fechafin1) . ', de conformidad con lo establecido en el artículo 117 del Acuerdo Superior 024 de 1993, para que ',  array('size' => 12));
-$textRun->addText($saludo_el_la,  array('size' => 12));
-$textRun->addText(' ' . $nombre_profesor, array('bold' => true,  'size' => 12));
-$textRun->addText(' participe en la misión académica mencionada.',  array('size' => 12));
-$textRun = $section->addTextRun($paragraphStyle);
-            $paragraphStyle = array('alignment' => Jc::BOTH, 'spaceAfter' => 10);
+$textRun->addText('En cumplimiento del deber de generar y socializar la ciencia, la cultura en la docencia, la investigación y la proyección social como fines misionales universitarios, se justifica la autorización de una comisión académica, ' . obtenerFechasFormateadas($fechainicio1, $fechafin1) . ', de conformidad con lo establecido en el artículo 117 del Acuerdo Superior 024 de 1993, para que ', array('size' => 12));
+$textRun->addText($saludo_el_la, array('size' => 12));
+$textRun->addText(' ' . $nombre_profesor, array('bold' => true, 'size' => 12));
+$textRun->addText(' participe en la misión académica mencionada.', array('size' => 12));
 
- $textRun->addText('Por lo expuesto,',  array('size' => 12));  
+// Nuevo párrafo solicitado
+$paragraphStyleJustified = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH, 'spaceAfter' => 10);
+$textRun = $section->addTextRun($paragraphStyleJustified);
+$textRun->addText('Que la presente comisión académica se tramita con fundamento en la solicitud presentada por el docente mediante el formato correspondiente, debidamente avalado por el Consejo de Facultad, con base en la información y documentación aportados como soporte de la misma, los cuales se presumen auténticos y veraces en virtud del principio de buena fe que rige las actuaciones administrativas, limitándose esta dependencia a la revisión y análisis de la solicitud conforme a los documentos aportados.', array('size' => 12));
+
+// Párrafo final
+    $section->addTextBreak(0);
+
+$textRun = $section->addTextRun($paragraphStyleJustified);
+$textRun->addText('Por lo expuesto,', array('size' => 12));
  
 
 // Añadir el título centrado

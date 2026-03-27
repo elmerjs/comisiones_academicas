@@ -748,9 +748,13 @@ $textRun->addText('Siendo este un evento de gran proyección nacional, que le pe
 $textRun = $section->addTextRun($paragraphStyle);
 $textRun->addText('En cumplimiento del deber de generar y socializar la ciencia, la cultura en la docencia, la investigación y la proyección social como fines misionales universitarios, de conformidad con lo establecido en el artículo 117 del Acuerdo Superior 024 de 1993, ' . $nombrarvice . ' encuentra justificada la autorización de la Comisión Académica en el territorio nacional a los profesores mencionados.', array('size' => 12));
 
+  // Nuevo párrafo solicitado
+$paragraphStyleJustified = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH, 'spaceAfter' => 10);
+$textRun = $section->addTextRun($paragraphStyleJustified);
+$textRun->addText('Que la presente comisión académica se tramita con fundamento en la solicitud presentada por el docente mediante el formato correspondiente, debidamente avalado por el Consejo de Facultad, con base en la información y documentación aportados como soporte de la misma, los cuales se presumen auténticos y veraces en virtud del principio de buena fe que rige las actuaciones administrativas, limitándose esta dependencia a la revisión y análisis de la solicitud conforme a los documentos aportados.', array('size' => 12));  
     
-    
-    
+     $section->addTextBreak(1);
+   
 
 $leftParagraphStyle = array('alignment' => Jc::LEFT, 'spaceAfter' => 150);
 $textRun = $section->addTextRun($leftParagraphStyle);

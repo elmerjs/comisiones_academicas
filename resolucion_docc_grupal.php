@@ -861,8 +861,12 @@ foreach ($fechas_profesores as $rango_fechas => $profesores) {
 
 
 
-    
-    
+// Nuevo párrafo solicitado
+$paragraphStyleJustified = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH, 'spaceAfter' => 10);
+$textRun = $section->addTextRun($paragraphStyleJustified);
+$textRun->addText('Que la presente comisión académica se tramita con fundamento en la solicitud presentada por el docente mediante el formato correspondiente, debidamente avalado por el Consejo de Facultad, con base en la información y documentación aportados como soporte de la misma, los cuales se presumen auténticos y veraces en virtud del principio de buena fe que rige las actuaciones administrativas, limitándose esta dependencia a la revisión y análisis de la solicitud conforme a los documentos aportados.', array('size' => 12));    
+     $section->addTextBreak(0);
+   
     
 
 $leftParagraphStyle = array('alignment' => Jc::LEFT, 'spaceAfter' => 150);

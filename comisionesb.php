@@ -419,6 +419,49 @@ $result = $conn->query($sql);
         line-height: 1.2; /* Ajusta la altura de la línea */
         border-radius: 0.2rem; /* Ajusta el radio de las esquinas si es necesario */
     }
+    /* Estilos para el modal de acciones */
+.action-card {
+    transition: all 0.2s ease-in-out;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+}
+.action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+    border-color: #c8a951;
+}
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+.action-card:hover .icon-circle {
+    transform: scale(1.05);
+}
+#accionesModal .modal-content {
+    border-radius: 24px;
+}
+#accionesModal .modal-header {
+    border-bottom: none;
+}
+#accionesModal .modal-footer {
+    border-top: none;
+}
+#accionesModal .close {
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: #6c757d;
+    opacity: 0.8;
+}
+#accionesModal .close:hover {
+    opacity: 1;
+}
 </style>
 
 </head>
@@ -444,15 +487,8 @@ $result = $conn->query($sql);
             <th style="width: 60px;font-size: 14px;">#Res</th>
             <!-- <th style="width: 20px;font-size: 14px;" class="text-center">Inform</th> -->
             <th style="width: 50px;font-size: 14px;">Tramitó</th>
-                      <th style="width: 30px;font-size: 14px;">Est</th>
-
-<th style="width: 80px;" class="text-center">Edit</th>
-            <th style="width: 80px;" class="text-center">Resol Indivd</th>
-                <th style="width: 80px;" class="text-center">Resol multi</th>
-
-<th style="width: 80px;" class="text-center">Subir informe</th>
-           <th style="width: 80px;" class="text-center">Anular</th>
-           <th style="width: 80px;" class="text-center">Clonar</th>
+            <th style="width: 30px;font-size: 14px;">Est</th>
+            <th style="width: 100px;" class="text-center">Acciones</th>
 
         </tr>
         </thead>
@@ -464,19 +500,19 @@ $result = $conn->query($sql);
                 
                   $observacionx = $row["link_resolucion"];
 
-    // Extraer el enlace desde observacion
-    $link = '';
-   if (!empty($observacionx)) {  // Verifica si $observacion no está vacía
-    $link = $observacionx;  // Asigna el valor de $observacion a $link
-}
+            // Extraer el enlace desde observacion
+            $link = '';
+           if (!empty($observacionx)) {  // Verifica si $observacion no está vacía
+            $link = $observacionx;  // Asigna el valor de $observacion a $link
+        }
 
-    // Crear el enlace HTML si se encuentra un enlace válido
-    if (!empty($link)) {
-        echo "<td style='font-size: 14px;'><a href='$link' target='_blank'>" . $row["id_comision"] . "</a></td>";
-    } else {
-        echo "<td style='font-size: 14px;'>" . $row["id_comision"] . "</td>";
-    }
-                
+            // Crear el enlace HTML si se encuentra un enlace válido
+            if (!empty($link)) {
+                echo "<td style='font-size: 14px;'><a href='$link' target='_blank'>" . $row["id_comision"] . "</a></td>";
+            } else {
+                echo "<td style='font-size: 14px;'>" . $row["id_comision"] . "</td>";
+            }
+
                 
              //   echo "<td style='font-size: 14px;'>". $row["id_comision"] . "</td>";
 echo "<td style='font-size: 14px;'>" . $row["documento_profesor"] . " - " . substr($row["apellido1"] . " " . substr($row["apellido1"], 0, 1) . ". " . $row["nombre1"]. " " . $row["nombre2"], 0, 20) . "</td>";
@@ -525,123 +561,23 @@ $id_comision = $row['id_comision'];
    // Icono de editar
 $link_editar = "actualizar_formacion.php?id={$id_comision}";
 $icon_editar = '<i class="fas fa-pencil-alt icono-editar"></i>'; // Agregamos la clase "icono-editar" al icono
-echo "<td class='text-center'><a href='$link_editar'>$icon_editar</a></td>";
-     
-// Icono de documento
-
-$link = $tipo_estudio == 'EXT' ? "resolucion_doc_ext.php?id={$id_comision}" : "resolucion_docb.php?id={$id_comision}";
- $linkb = $tipo_estudio == 'EXT' ? "resolucion_doc_ext_b.php?id={$id_comision}" : "resolucion_docc.php?id={$id_comision}";
-
-$icon_doc = '<i class="far fa-file-word icono-doc"></i>'; // Agregamos la clase "icono-doc" al icono
-echo "<td class='text-center'> <a href='$linkb'>$icon_doc</a></td>";
-//nuevo td dow conjunto
-                $no_resolucion = $row["No_resolucion"];
+// Después de mostrar el estado (línea donde se muestra $estado_abreviado)
+$tipo_estudio = $row['tipo_estudio'];
+$id_comision = $row['id_comision'];
+$no_resolucion = $row["No_resolucion"];
 $fecha_resolucion = $row["fecha_resolucion"];
 
-// Enlace con parámetros
-$linkb = "resolucion_docc_grupal_t.php?no_resolucion=$no_resolucion&fecha_resolucion=$fecha_resolucion";
-$link = "resolucion_docc_grupal.php?no_resolucion=$no_resolucion&fecha_resolucion=$fecha_resolucion";
-
-// Ícono de documento agrupado
-$icon_doc = '<i class="fas fa-layer-group icono-doc"></i>'; // Utilizamos el ícono "fa-layer-group" para representar agrupación
-
-// Generar la celda
 echo "<td class='text-center'>
-        <a href='$link' title='en párrafo'>$icon_doc</a>
-        <a href='$linkb' title='en tabla'>$icon_doc</a>
-      </td>";//termina doc concjunto
-
-// Icono de informe con clase
-$icon_informe = '<i class="fas fa-file-signature icono-informe"></i>'; // Agregamos la clase "icono-informe" al icono
-echo "<td class='text-center'><button type='button' class='btn btn-primary informe-btn' data-toggle='modal' data-target='#informeModal' data-id='$id_comision'>$icon_informe</button></td>";
-echo "<td class='text-center'>";
-echo "<button type='button' class='btn btn-danger btn-sm anular-btn' onclick=\"confirmarAnulacion({$id_comision});\" title='Anular y descargar'>";
-echo "<i class='fas fa-ban'></i>"; // Ícono pequeño
-echo "</button>";
-echo "</td>";
-
-echo "<script>
-function confirmarAnulacion(comisionId) {
-    // Pedir el medio de comunicación con un texto de ejemplo
-    var medio_comunicacion = prompt('Indique el medio de comunicación (ej. Oficio 3.5.5-4 del 3 de agosto de 2024):');
-    
-    // Si se cancela el prompt o se deja vacío, cancelar la operación
-    if (!medio_comunicacion) {
-        alert('Debe proporcionar el medio de comunicación.');
-        return;
-    }
-    
-    // Pedir la razón con un texto de ejemplo
-    var razon = prompt('Indique el motivo de anulación (ej. Problemas logísticos con la entidad...):');
-    
-    // Si se cancela el prompt o se deja vacío, cancelar la operación
-    if (!razon) {
-        alert('Debe proporcionar una razón.');
-        return;
-    }
-    
-    // Confirmar la acción de anulación
-    if (confirm('¿Está seguro que desea anular el registro?')) {
-        // Mostrar un mensaje de carga
-        document.body.insertAdjacentHTML('beforeend', '<div id=\"loading\" style=\"position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:20px; background:white; border:1px solid #ccc; border-radius:5px; box-shadow:0 0 10px rgba(0,0,0,0.2);\">Procesando, por favor espere...</div>');
-
-        // Crear un iframe oculto para realizar la solicitud y descargar el archivo
-        var iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = 'anular_registro.php?comision_id=' + comisionId + 
-                      '&medio_comunicacion=' + encodeURIComponent(medio_comunicacion) +
-                      '&razon=' + encodeURIComponent(razon);
-        document.body.appendChild(iframe);
-
-        // Esperar un momento para que la descarga se complete
-        setTimeout(function() {
-            // Ocultar el mensaje de carga
-            document.getElementById('loading').remove();
-            // Recargar la página principal
-            location.reload();
-        }, 1000); // Esperar 3 segundos
-    }
-}
-</script>";
-                
-                echo "<td class='text-center'>";
-echo "<button type='button' class='btn btn-success btn-sm clonar-btn' onclick=\"confirmarClonacion({$id_comision});\" title='Clonar registro'>";
-echo "<i class='fas fa-clone'></i>"; // Ícono pequeño de clonar
-echo "</button>";
-echo "</td>";
-                echo "<script>
-function confirmarClonacion(comisionId) {
-    // Pedir la cédula del tercero con un texto de ejemplo
-    var cedula_tercero = prompt('Indique la cédula del tercero:');
-    
-    // Si se cancela el prompt o se deja vacío, cancelar la operación
-    if (!cedula_tercero) {
-        alert('Debe proporcionar la cédula del tercero.');
-        return;
-    }
-
-    // Confirmar la acción de clonación
-    if (confirm('¿Está seguro que desea clonar el registro con la cédula proporcionada?')) {
-        // Mostrar un mensaje de carga
-        document.body.insertAdjacentHTML('beforeend', '<div id=\"loading\" style=\"position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:20px; background:white; border:1px solid #ccc; border-radius:5px; box-shadow:0 0 10px rgba(0,0,0,0.2);\">Procesando, por favor espere...</div>');
-        
-        // Crear un iframe oculto para realizar la solicitud
-        var iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = 'clonar_registro.php?comision_id=' + comisionId + 
-                      '&cedula_tercero=' + encodeURIComponent(cedula_tercero);
-        document.body.appendChild(iframe);
-
-        // Esperar un momento para que la clonación se complete
-        setTimeout(function() {
-            // Ocultar el mensaje de carga
-            document.getElementById('loading').remove();
-            // Recargar la página principal
-            location.reload();
-        }, 1000); // Esperar 1 segundo
-    }
-}
-</script>";
+        <button type='button' class='btn btn-sm btn-outline-secondary acciones-btn' 
+                data-id='{$id_comision}'
+                data-tipo='{$tipo_estudio}'
+                data-no-resolucion='".htmlspecialchars($no_resolucion)."'
+                data-fecha-resolucion='{$fecha_resolucion}'
+                data-toggle='modal' 
+                data-target='#accionesModal'>
+            <i class='fas fa-ellipsis-h'></i> Acciones
+        </button>
+      </td>";
                 echo "</tr>";
             }
         }
@@ -678,6 +614,92 @@ function confirmarClonacion(comisionId) {
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" id="guardarCambiosBtn">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de acciones unificadas -->
+<!-- Modal de acciones unificadas (versión mejorada UX) -->
+<div class="modal fade" id="accionesModal" tabindex="-1" role="dialog" aria-labelledby="accionesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="accionesModalLabel">
+                    <i class="fas fa-cog me-2 text-primary"></i>Acciones de la comisión
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body pt-0">
+                <div class="row g-4 text-center mt-2">
+                    <!-- Editar -->
+                    <div class="col-6 col-md-3">
+                        <a href="#" id="modalEditar" class="action-card d-block p-3 rounded-4 text-decoration-none">
+                            <div class="icon-circle mx-auto mb-2" style="background-color: #e9f0ff;">
+                                <i class="fas fa-pencil-alt fa-2x" style="color: #1a2a4a;"></i>
+                            </div>
+                            <span class="fw-semibold">Editar</span>
+                        </a>
+                    </div>
+                    <!-- Resolución Individual -->
+                    <div class="col-6 col-md-3">
+                        <a href="#" id="modalResInd" class="action-card d-block p-3 rounded-4 text-decoration-none">
+                            <div class="icon-circle mx-auto mb-2" style="background-color: #fff5e6;">
+                                <i class="far fa-file-word fa-2x" style="color: #c8a951;"></i>
+                            </div>
+                            <span class="fw-semibold">Res. Individual</span>
+                        </a>
+                    </div>
+                    <!-- Resolución Multi (párrafo) -->
+                    <div class="col-6 col-md-3">
+                        <a href="#" id="modalResMultiP" class="action-card d-block p-3 rounded-4 text-decoration-none">
+                            <div class="icon-circle mx-auto mb-2" style="background-color: #fff5e6;">
+                                <i class="fas fa-layer-group fa-2x" style="color: #c8a951;"></i>
+                            </div>
+                            <span class="fw-semibold">Res. Multi (párrafo)</span>
+                        </a>
+                    </div>
+                    <!-- Resolución Multi (tabla) -->
+                    <div class="col-6 col-md-3">
+                        <a href="#" id="modalResMultiT" class="action-card d-block p-3 rounded-4 text-decoration-none">
+                            <div class="icon-circle mx-auto mb-2" style="background-color: #fff5e6;">
+                                <i class="fas fa-table fa-2x" style="color: #c8a951;"></i>
+                            </div>
+                            <span class="fw-semibold">Res. Multi (tabla)</span>
+                        </a>
+                    </div>
+                    <!-- Subir Informe -->
+                    <div class="col-6 col-md-3">
+                        <button type="button" id="modalSubirInforme" class="action-card w-100 p-3 rounded-4 text-decoration-none border-0 bg-transparent">
+                            <div class="icon-circle mx-auto mb-2" style="background-color: #e6f4ea;">
+                                <i class="fas fa-file-signature fa-2x" style="color: #2d6a4f;"></i>
+                            </div>
+                            <span class="fw-semibold">Subir informe</span>
+                        </button>
+                    </div>
+                    <!-- Anular -->
+                    <div class="col-6 col-md-3">
+                        <button type="button" id="modalAnular" class="action-card w-100 p-3 rounded-4 text-decoration-none border-0 bg-transparent">
+                            <div class="icon-circle mx-auto mb-2" style="background-color: #ffe6e6;">
+                                <i class="fas fa-ban fa-2x" style="color: #dc3545;"></i>
+                            </div>
+                            <span class="fw-semibold">Anular</span>
+                        </button>
+                    </div>
+                    <!-- Clonar -->
+                    <div class="col-6 col-md-3">
+                        <button type="button" id="modalClonar" class="action-card w-100 p-3 rounded-4 text-decoration-none border-0 bg-transparent">
+                            <div class="icon-circle mx-auto mb-2" style="background-color: #e9f0ff;">
+                                <i class="fas fa-clone fa-2x" style="color: #0d6efd;"></i>
+                            </div>
+                            <span class="fw-semibold">Clonar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -781,85 +803,145 @@ function confirmarClonacion(comisionId) {
     </div>
   </div>
 </div>
-
 <script>
-function applyFiltersb() {
-  // Obtener los valores seleccionados para el reporte de Austeridad
-  var vigenciab = document.getElementById("vigenciab").value;
-  var trimestreb = document.getElementById("trimestreb").value;
-  var tipo_comisionb = document.getElementById("tipo_comisionb").value;
-  
-  // Construir la URL con los parámetros de filtro
-  // **Asegúrate de reemplazar 'excel_austeridad.php' con el nombre de tu script de generación de Excel**
-  var url = "excel_austeridad.php?vigencia=" + encodeURIComponent(vigenciab) + 
-            "&trimestre=" + encodeURIComponent(trimestreb) + 
-            "&tipo_comision=" + encodeURIComponent(tipo_comisionb);
-  
-  // Redirigir al script de generación del archivo Excel
-  window.location.href = url;
+// Funciones globales de anulación y clonación (definidas una sola vez)
+function confirmarAnulacion(comisionId) {
+    var medio_comunicacion = prompt('Indique el medio de comunicación (ej. Oficio 3.5.5-4 del 3 de agosto de 2024):');
+    if (!medio_comunicacion) {
+        alert('Debe proporcionar el medio de comunicación.');
+        return;
+    }
+    var razon = prompt('Indique el motivo de anulación (ej. Problemas logísticos con la entidad...):');
+    if (!razon) {
+        alert('Debe proporcionar una razón.');
+        return;
+    }
+    if (confirm('¿Está seguro que desea anular el registro?')) {
+        document.body.insertAdjacentHTML('beforeend', '<div id=\"loading\" style=\"position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:20px; background:white; border:1px solid #ccc; border-radius:5px; box-shadow:0 0 10px rgba(0,0,0,0.2);\">Procesando, por favor espere...</div>');
+        var iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = 'anular_registro.php?comision_id=' + comisionId + 
+                      '&medio_comunicacion=' + encodeURIComponent(medio_comunicacion) +
+                      '&razon=' + encodeURIComponent(razon);
+        document.body.appendChild(iframe);
+        setTimeout(function() {
+            document.getElementById('loading').remove();
+            location.reload();
+        }, 1000);
+    }
 }
-</script>
-    <!--termina filtro-->
-<script>
+
+function confirmarClonacion(comisionId) {
+    var cedula_tercero = prompt('Indique la cédula del tercero:');
+    if (!cedula_tercero) {
+        alert('Debe proporcionar la cédula del tercero.');
+        return;
+    }
+    if (confirm('¿Está seguro que desea clonar el registro con la cédula proporcionada?')) {
+        document.body.insertAdjacentHTML('beforeend', '<div id=\"loading\" style=\"position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:20px; background:white; border:1px solid #ccc; border-radius:5px; box-shadow:0 0 10px rgba(0,0,0,0.2);\">Procesando, por favor espere...</div>');
+        var iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = 'clonar_registro.php?comision_id=' + comisionId + 
+                      '&cedula_tercero=' + encodeURIComponent(cedula_tercero);
+        document.body.appendChild(iframe);
+        setTimeout(function() {
+            document.getElementById('loading').remove();
+            location.reload();
+        }, 1000);
+    }
+}
+
 $(document).ready(function() {
+    // Inicializar DataTable
     $('#comisionesTable').DataTable({
-           "order": [],
-         "columnDefs": [
-            {
-                "targets": 0, // Índice de la primera columna
-                "visible": false // Oculta la columna
-            }
-        ],// No aplica ningún orden predeterminado
-                stateSave: true 
-
+        "order": [],
+        "columnDefs": [
+            { "targets": 0, "visible": false }
+        ],
+        "stateSave": true
     });
-    
-    // Al abrir el modal de informe, cargar los datos actuales del informe
-    $('#informeModal').on('show.bs.modal', function (event) {
+
+    // Modal de acciones
+    $('#accionesModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);
-        var comisionId = button.data('id');
-        var modal = $(this);
-        modal.find('#comision_id').val(comisionId);
-        
-        // Realizar una llamada AJAX para obtener los datos del informe
-        $.ajax({
-            url: 'obtener_datos_informe.php',
-            type: 'POST',
-            data: {
-                comision_id: comisionId
-            },
-            success: function(response) {
-                console.log(response); // Verificar el contenido de la respuesta
+        var id = button.data('id');
+        var tipo = button.data('tipo');
+        var noResolucion = button.data('no-resolucion');
+        var fechaResolucion = button.data('fecha-resolucion');
 
-                // Intentar parsear la respuesta JSON
-                var data = JSON.parse(response);
+        var linkEditar = 'actualizar_formacion.php?id=' + id;
+        var linkResInd = (tipo === 'EXT') ? 'resolucion_doc_ext.php?id=' + id : 'resolucion_docb.php?id=' + id;
+        var linkResMultiP = 'resolucion_docc_grupal.php?no_resolucion=' + encodeURIComponent(noResolucion) + '&fecha_resolucion=' + encodeURIComponent(fechaResolucion);
+        var linkResMultiT = 'resolucion_docc_grupal_t.php?no_resolucion=' + encodeURIComponent(noResolucion) + '&fecha_resolucion=' + encodeURIComponent(fechaResolucion);
 
-                if (data.error) {
-                    console.error(data.error);
-                } else {
-                    modal.find('#fecha_informe').val(data.fecha_informe_formateada);
-                    modal.find('#folios').val(data.folios);
+        $('#modalEditar').attr('href', linkEditar);
+        $('#modalResInd').attr('href', linkResInd);
+        $('#modalResMultiP').attr('href', linkResMultiP);
+        $('#modalResMultiT').attr('href', linkResMultiT);
+
+        // Guardar ID para acciones que no son enlaces
+        $('#modalSubirInforme').data('id', id);
+        $('#modalAnular').data('id', id);
+        $('#modalClonar').data('id', id);
+    });
+
+    // Subir informe: abrir el modal existente
+    $('#modalSubirInforme').on('click', function() {
+        var id = $(this).data('id');
+        // Activar el modal de informe pasándole el ID
+        $('#informeModal').data('id', id);
+        $('#informeModal').modal('show');
+    });
+
+    // Anular
+    $('#modalAnular').on('click', function() {
+        var id = $(this).data('id');
+        confirmarAnulacion(id);
+        $('#accionesModal').modal('hide');
+    });
+
+    // Clonar
+    $('#modalClonar').on('click', function() {
+        var id = $(this).data('id');
+        confirmarClonacion(id);
+        $('#accionesModal').modal('hide');
+    });
+
+    // Modal de informe: adaptado para recibir ID desde el nuevo botón
+    $('#informeModal').on('show.bs.modal', function (event) {
+        var comisionId = $(this).data('id');
+        if (!comisionId) {
+            // Si viene del botón tradicional, lo obtiene del relatedTarget
+            var button = $(event.relatedTarget);
+            comisionId = button ? button.data('id') : null;
+        }
+        if (comisionId) {
+            $(this).find('#comision_id').val(comisionId);
+            // Cargar datos del informe
+            $.ajax({
+                url: 'obtener_datos_informe.php',
+                type: 'POST',
+                data: { comision_id: comisionId },
+                success: function(response) {
+                    var data = JSON.parse(response);
+                    if (!data.error) {
+                        $('#informeModal').find('#fecha_informe').val(data.fecha_informe_formateada);
+                        $('#informeModal').find('#folios').val(data.folios);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-            }
-        });
+            });
+        }
     });
 
     // Guardar cambios del informe
     $('#guardarCambiosBtn').click(function() {
-        var form = $('#informeModal form');
-        var comisionId = form.find('#comision_id').val();
-        var fechaInforme = form.find('#fecha_informe').val();
-        var folios = form.find('#folios').val();
+        var comisionId = $('#informeModal').find('#comision_id').val();
+        var fechaInforme = $('#informeModal').find('#fecha_informe').val();
+        var folios = $('#informeModal').find('#folios').val();
 
-        // Mostrar los valores en la consola del navegador
-        console.log("Comisión ID: " + comisionId);
-        console.log("Fecha Informe: " + fechaInforme);
-        console.log("Folios: " + folios);
-
-        // Enviar los datos al script de actualización vía AJAX
         $.ajax({
             url: 'actualizar_solicitud_informe_modal.php',
             type: 'POST',
@@ -869,37 +951,34 @@ $(document).ready(function() {
                 folios: folios
             },
             success: function(response) {
-                // Manejar la respuesta del servidor (opcional)
-                console.log(response);
-
-                // Cerrar el modal después de actualizar los datos
                 $('#informeModal').modal('hide');
-
-                // Recargar la página para reflejar los cambios (opcional)
                 location.reload();
             },
             error: function(xhr, status, error) {
-                // Manejar errores de AJAX (opcional)
                 console.error(xhr.responseText);
             }
         });
-    }); 
+    });
 });
-</script>
 
-    <script>
+// Funciones para los reportes (sin cambios)
 function applyFilters() {
-  // Obtener los valores seleccionados en el formulario
-  var estado = document.getElementById("estado").value;
-  var reintegrado = document.getElementById("reintegrado").value;
-  var vigencia = document.getElementById("vigencia").value;
-  var tipo_comision = document.getElementById("tipo_comision").value;
+    var estado = document.getElementById("estado").value;
+    var reintegrado = document.getElementById("reintegrado").value;
+    var vigencia = document.getElementById("vigencia").value;
+    var tipo_comision = document.getElementById("tipo_comision").value;
+    var url = "excel_c_academicas.php?estado=" + encodeURIComponent(estado) + "&reintegrado=" + encodeURIComponent(reintegrado)+ "&vigencia=" + encodeURIComponent(vigencia)+ "&tipo_comision=" + encodeURIComponent(tipo_comision);
+    window.location.href = url;
+}
 
-  // Construir la URL con los parámetros de filtro
-  var url = "excel_c_academicas.php?estado=" + encodeURIComponent(estado) + "&reintegrado=" + encodeURIComponent(reintegrado)+ "&vigencia=" + encodeURIComponent(vigencia)+ "&tipo_comision=" + encodeURIComponent(tipo_comision);
-  
-  // Redirigir al script de generación del archivo Excel
-  window.location.href = url;
+function applyFiltersb() {
+    var vigenciab = document.getElementById("vigenciab").value;
+    var trimestreb = document.getElementById("trimestreb").value;
+    var tipo_comisionb = document.getElementById("tipo_comisionb").value;
+    var url = "excel_austeridad.php?vigencia=" + encodeURIComponent(vigenciab) + 
+              "&trimestre=" + encodeURIComponent(trimestreb) + 
+              "&tipo_comision=" + encodeURIComponent(tipo_comisionb);
+    window.location.href = url;
 }
 </script>
 </body>
