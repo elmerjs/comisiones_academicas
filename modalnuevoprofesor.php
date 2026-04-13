@@ -1,291 +1,259 @@
 <style>
-
+    /* Estilos específicos para el modal (complementan los globales) */
+    .modal-uc .modal-content {
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 20px 35px -10px rgba(0,0,0,0.2);
+    }
+    .modal-uc .modal-header {
+        background: linear-gradient(135deg, var(--azul-oscuro, #002A9E), var(--morado, #4C19AF));
+        color: white;
+        border-radius: 24px 24px 0 0;
+        padding: 1rem 1.5rem;
+        border-bottom: none;
+    }
+    .modal-uc .modal-header .close {
+        color: white;
+        opacity: 0.8;
+        text-shadow: none;
+    }
+    .modal-uc .modal-header .close:hover {
+        opacity: 1;
+    }
+    .modal-uc .modal-body {
+        padding: 2rem 1.5rem;
+    }
+    .modal-uc .modal-footer {
+        border-top: 1px solid #e9ecef;
+        padding: 1rem 1.5rem;
+    }
+    .modal-uc .form-group label {
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+    .modal-uc .form-control, .modal-uc .custom-select {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    .modal-uc .form-control:focus, .modal-uc .custom-select:focus {
+        border-color: var(--azul-cielo, #16A8E1);
+        box-shadow: 0 0 0 3px rgba(22,168,225,0.1);
+    }
+    .btn-uc-modal {
+        border-radius: 40px;
+        padding: 8px 24px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+    }
+    .btn-uc-modal-primary {
+        background: var(--verde, #249337);
+        color: white;
+        border: none;
+    }
+    .btn-uc-modal-primary:hover {
+        background: #1a6e2c;
+        transform: translateY(-1px);
+    }
+    .btn-uc-modal-secondary {
+        background: #e9ecef;
+        color: #1e293b;
+        border: none;
+    }
+    .btn-uc-modal-secondary:hover {
+        background: #dee2e6;
+    }
 </style>
-<!-- Ventana modal -->
-<div id="myModalb" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-   
-    <form id="resolucionForm" method="post" action="inserttercero.php">
-  <div class="row">
-         <div class="col-md-12">
-             <h4 class="text-center">Crear Tercero</h4>
-         </div>
-     </div>
-     
-     <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="documento" class="control-label">Documento:</label>
-                <input type="text" id="documento" class="form-control" name="documento">
+
+<!-- Modal Bootstrap 4 (estructura moderna) -->
+<div class="modal fade" id="myModalb" tabindex="-1" role="dialog" aria-labelledby="myModalbLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content modal-uc">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalbLabel">
+                    <i class="fas fa-user-plus"></i> Crear Nuevo Profesor
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <form id="resolucionForm" method="post" action="inserttercero.php">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="documento">Documento *</label>
+                                <input type="text" id="documento" class="form-control" name="documento" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="sexo">Sexo *</label>
+                                <select id="sexo" name="sexo" class="form-control" required>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Femenino</option>
+                                    <option value="O">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nombre1">Primer Nombre *</label>
+                                <input type="text" id="nombre1" class="form-control" name="nombre1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nombre2">Segundo Nombre</label>
+                                <input type="text" id="nombre2" class="form-control" name="nombre2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="apellido1">Primer Apellido *</label>
+                                <input type="text" id="apellido1" class="form-control" name="apellido1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="apellido2">Segundo Apellido</label>
+                                <input type="text" id="apellido2" class="form-control" name="apellido2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="vincul">Vinculación *</label>
+                                <select id="vincul" name="vincul" class="form-control" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="PLANTA">PLANTA</option>
+                                    <option value="OCASIONAL">OCASIONAL</option>
+                                    <option value="HORA CATEDRA">HORA CATEDRA</option>
+                                    <option value="DOCENTES ENCARGO ADM.">DOCENTES ENCARGO ADM.</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="vinculacion">Dedicación *</label>
+                                <select id="vinculacion" name="vinculacion" class="form-control" required>
+                                    <option value="TC">Tiempo Completo</option>
+                                    <option value="MT">Medio Tiempo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="escalafon">Escalafón *</label>
+                                <select id="escalafon" name="escalafon" class="form-control" required>
+                                    <option value="TITULAR">TITULAR</option>
+                                    <option value="ASOCIADO">ASOCIADO</option>
+                                    <option value="ASISTENTE">ASISTENTE</option>
+                                    <option value="AUXILIAR">AUXILIAR</option>
+                                    <option value="CATEGORIA A">CATEGORIA A</option>
+                                    <option value="CATEGORIA B">CATEGORIA B</option>
+                                    <option value="CATEGORI C">CATEGORIA C</option>
+                                    <option value="CATEGORIA D">CATEGORIA D</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="depto">Departamento *</label>
+                                <select id="depto" name="depto" class="form-control" required>
+                                    <?php
+                                    // Conexión ya está disponible por el include de headerz.php
+                                    $query_departamentos = "SELECT d.PK_DEPTO, d.NOMBRE_DEPTO_CORT, f.NOMBREC_FAC
+                                                            FROM deparmanentos d
+                                                            INNER JOIN facultad f ON d.FK_FAC = f.PK_FAC 
+                                                            ORDER BY d.NOMBRE_DEPTO_CORT ASC";
+                                    $resultado_departamentos = $conn->query($query_departamentos);
+                                    if ($resultado_departamentos->num_rows > 0) {
+                                        while ($fila = $resultado_departamentos->fetch_assoc()) {
+                                            echo '<option value="' . $fila['PK_DEPTO'] . '">' 
+                                                 . htmlspecialchars($fila['NOMBRE_DEPTO_CORT']) . ' - ' 
+                                                 . htmlspecialchars($fila['NOMBREC_FAC']) . '</option>';
+                                        }
+                                    } else {
+                                        echo '<option value="">No hay departamentos disponibles</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="cargo">Cargo administrativo</label>
+                                <select id="cargo" name="cargo" class="form-control">
+                                    <option value="">Ninguno</option>
+                                    <option value="COORDINADORPS">COORDINADOR Posgrado</option>
+                                    <option value="COORDINADORPR">COORDINADOR Pregrado</option>
+                                    <option value="JEFE">JEFE DE DEPTO</option>
+                                    <option value="DIRECTOR">DIRECTOR</option>
+                                    <option value="DECANO">DECANO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" class="form-control" name="email">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="estado">Estado *</label>
+                                <select id="estado" name="estado" class="form-control" required>
+                                    <option value="ac">ACTIVO</option>
+                                    <option value="in">INACTIVO</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="fecha_ingreso">Fecha ingreso *</label>
+                                <input type="date" id="fecha_ingreso" class="form-control" name="fecha_ingreso" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-uc-modal-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-uc-modal-primary">
+                        <i class="fas fa-save"></i> Guardar Profesor
+                    </button>
+                </div>
+            </form>
         </div>
-         <div class="col-md-6">
-                <div class="form-group">
-                        <label for="sexo" class="control-label">Sexo:</label>
-
-                    <select id="sexo" name="sexo" required class="form-control">
-                        <option value="M">Masculino</option>
-                        <option value="F">Femenino</option>
-                        <option value="O">Otro</option>
-                       
-                    </select>
-                </div> 
-            </div>
-               
-     </div>
-        
-         <div class="row">
-            <div class="col-md-6">
-             <div class="form-group">
-            <label for="nombre1" class="control-label">Primer Nombre:</label>
-            <input type="text" id="nombre1" class="form-control" name="nombre1"  >
-        </div>
-            </div>
-               
-            <div class="col-md-6">
-             <div class="form-group">
-            <label for="nombre2" class="control-label">Segundo Nombre:</label>
-            <input type="text" id="nombre2" class="form-control" name="nombre2"  >
-        </div>
-            </div>
-         </div>
-        
-                <div class="row">
-            <div class="col-md-6">
-             <div class="form-group">
-            <label for="apellido1" class="control-label">Primer Apellido:</label>
-            <input type="text" id="apellido1" class="form-control" name="apellido1" >
-        </div>
-            </div>
-               
-            <div class="col-md-6">
-             <div class="form-group">
-            <label for="apellido2" class="control-label">Segundo Apellido:</label>
-            <input type="text" id="apellido2" class="form-control" name="apellido2"  >
-        </div>
-            </div>
-         </div>
-        
-       
-        
-        
-            <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="vincul" class="control-label">Vinculación:</label>
-                    <select id="vincul" name="vincul" required class="form-control">
-                                               <option value="PLANTA"></option>
-
-                        <option value="PLANTA">PLANTA</option>
-                        <option value="OCASIONAL">OCASIONAL</option>
-                        <option value="HORA CATEDRA">HORA CATEDRA</option>
-                         <option value="DOCENTES ENCARGO ADM.">DOCENTES ENCARGO ADM.</option>
-                    </select>
-                </div> 
-            </div>
-               
-              <div class="col-md-4"> 
-      <div class="form-group">
-            <label for="vinculacion" class="control-label">Dedicación:</label>
-                    <select id="vinculacion" name="vinculacion" required class="form-control">
-                       
-                        <option value="TC">Tiempo Completo</option>
-                        <option value="MT">Medio Tiempo</option>
-                 
-                    </select>
-                </div> 
-    </div>
-                
-                
-           <div class="col-md-4"> 
-      <div class="form-group">
-            <label for="escalafon" class="control-label">Escalafon:</label>
-                    <select id="escalafon" name="escalafon" required class="form-control">
-                            
-                        <option value="TITULAR">TITULAR</option>
-                        <option value="ASOCIADO">ASOCIADO</option>
-                        <option value="ASISTENTE">ASISTENTE</option>
-                        <option value="AUXILIAR">AUXILIAR</option>
-                        <option value="CATEGORIA A">CATEGORIA A</option>
-                        <option value="CATEGORIA B">CATEGORIA B</option>
-                        <option value="CATEGORI C">CATEGORIA C</option>
-                        <option value="CATEGORIA D">CATEGORIA D</option>
-                        
-                 
-                    </select>
-                </div> 
-    </div>
-                
-         </div>
-        
-        
-            <div class="row">
-            <div class="col-md-6">
-               
-                
-                
-         
-                
-         <div class="form-group">
-    <label for="depto" class="control-label">Departamento:</label>
-    <select id="depto" name="depto" required class="form-control">
-        <?php
-        // Obtener el departamento del tercero seleccionado
-       // $departamento_tercero = $departamento; // Ajusta esto al nombre de la variable que contiene el departamento del tercero
-
-        // Realizar consulta SQL para obtener los departamentos con su facultad asociada
-        $query_departamentos = "SELECT d.PK_DEPTO, d.NOMBRE_DEPTO_CORT, f.NOMBREC_FAC
-                                FROM deparmanentos d
-                                INNER JOIN facultad f ON d.FK_FAC = f.PK_FAC order by  d.NOMBRE_DEPTO_CORT asc";
-        $resultado_departamentos = $conn->query($query_departamentos);
-
-        // Verificar si hay resultados y generar opciones del select
-        if ($resultado_departamentos->num_rows > 0) {
-            while ($fila_departamento = $resultado_departamentos->fetch_assoc()) {
-                $pk_depto = $fila_departamento['PK_DEPTO'];
-                $nombre_depto_corto = $fila_departamento['NOMBRE_DEPTO_CORT'];
-                $nombre_facultad = $fila_departamento['NOMBREC_FAC'];
-
-                // Verificar si el departamento actual coincide con el departamento del tercero
-               
-                    // Utilizar PK_DEPTO como valor y NOMBRE_DEPTO_CORT junto con el nombre de la facultad como texto visible para la opción seleccionada
-                    echo '<option value="' . $pk_depto . '" selected>' . $nombre_depto_corto . ' - ' . $nombre_facultad . '</option>';
-               
-            }
-        } else {
-            // Si no hay resultados, mostrar un mensaje indicando que no hay departamentos disponibles
-            echo '<option value="">No hay departamentos disponibles</option>';
-        }
-        ?>
-    </select>
-</div>
-
-                
-                
-                
-                
-            </div>
-               
-        <div class="col-md-6">
-    <div class="form-group">
-        <label for="cargo" class="control-label">Cargo administrativo:</label>
-        <select id="cargo" name="cargo" class="form-control">
-            <option value="">Seleccionar...</option> <!-- Opción por defecto con valor nulo -->
-            <?php
-            // Lista de opciones y sus valores asociados
-            $opciones = array(
-                "COORDINADORPS" => "COORDINADOR Posg",
-                "COORDINADORPR" => "COORDINADOR Preg",
-                "JEFE" => "JEFE DE DEPTO",
-                "DIRECTOR" => "DIRECTOR",
-                "DECANO" => "DECANO"
-            );
-
-            // Iterar sobre las opciones para crear las etiquetas <option>
-            foreach ($opciones as $valor => $etiqueta) {
-                // Imprimir la etiqueta <option> con el valor y etiqueta correspondientes
-                echo "<option value=\"$valor\">$etiqueta</option>";
-            }
-            ?>
-        </select>
     </div>
 </div>
-         </div> 
-        
-        
-          <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                        <label for="email" class="control-label">Email:</label>
-                        <input type="email" id="email" class="form-control" name="email">
-                </div> 
-            </div>
-               
-              <div class="col-md-4">
-                <div class="form-group">
-                        <label for="estado" class="control-label">Estado:</label>
 
-                    <select id="estado" name="estado" required class="form-control">
-                        <option value="ac">ACTIVO</option>
-                        <option value="in">INACTIVO</option>
-                    </select>
-                </div> 
-            </div>
-               <div class="col-md-4">
-                <div class="form-group">
-                        <label for="fecha_ingreso" class="control-label">fecha ingreso:</label>
-                <input type="date" id="fecha_ingreso" class="form-control" name="fecha_ingreso" required>
-
-                </div> 
-            </div>
-         </div>
-        
-     
-            
-      <button type="submit">Guardar</button>
-    </form>
-  </div>
-</div>
-
-
-
-
-<script src="script.js"></script>
-
-                 
-        <script>
+<script>
+// Abrir modal con Bootstrap (ya no necesita JS manual, pero mantenemos compatibilidad)
 $(document).ready(function() {
-    $('#profesor').change(function() {
-        var profesorId = $(this).val(); // Obtén el valor seleccionado del campo profesor
-        // Realiza una petición AJAX para obtener la información del profesor y su departamento
-        $.ajax({
-            url: 'obtener_departamento.php', // El archivo PHP que maneja la solicitud AJAX
-            method: 'GET',
-            data: { profesor_id: profesorId }, // Envía el ID del profesor como parámetro
-            dataType: 'json',
-            success: function(response) {
-                // Llena el campo de departamento con el valor obtenido
-                $('#departamento').val(response.departamento);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error al obtener el departamento:', error);
-            }
-        });
+    $('#openModalBtnb').click(function() {
+        $('#myModalb').modal('show');
     });
 });
-            
-            
-       
-            
-            
-</script>  
-                 
-                  <script>
-$(document).ready(function() {
-    $('#profesor').change(function() {
-        var profesorId = $(this).val(); // Obtén el valor seleccionado del campo profesor
-        // Realiza una petición AJAX para obtener la información del profesor y su fac
-        $.ajax({
-            url: 'obtener_facultad.php', // El archivo PHP que maneja la solicitud AJAX
-            method: 'GET',
-            data: { profesor_id: profesorId }, // Envía el ID del profesor como parámetro
-            dataType: 'json',
-            success: function(response) {
-                // Llena el campo de departamento con el valor obtenido
-                $('#facultad').val(response.facultad);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error al obtener la fac:', error);
-            }
-        });
-    });
-});
-            
-            
-       
-            
-            
-</script>        
-
-
+</script>

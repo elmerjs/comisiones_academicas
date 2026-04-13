@@ -207,8 +207,7 @@ if ($resultadores->num_rows > 0) {
         $comisionado = "el profesor comisionado";
     }
 
-$trabajo = htmlspecialchars($row['nombre_trabajo'], ENT_QUOTES, 'UTF-8');
-
+$trabajo = $row['nombre_trabajo']; // Sin htmlspecialchars
 if ($trabajo == null) {
     $coneltrabajo = "";
     $parrafoini_trabajo = " en la medida que su participación en este evento de gran proyección nacional, tendrá la oportunidad de compartir sus conocimientos y adquirir nuevos, compartir su experiencia académica y profesional, fortalecer lazos interinstitucionales y dar visibilidad a su programa y al Alma Máter";
@@ -216,8 +215,8 @@ if ($trabajo == null) {
      $coneltrabajo = "; en la medida en su participación se dará en calidad de ponente con el trabajo  ".$trabajo;
     $parrafoini_trabajo= " en la medida que su participación se dará en calidad de ponente con el trabajo «".$trabajo. "», siendo este un evento de gran proyección nacional, que le permitirá compartir sus conocimientos y adquirir nuevos, compartir su experiencia académica y profesional, fortalecer lazos interinstitucionales y dar visibilidad a su Programa y al Alma Máter";
 }
-$evento = htmlspecialchars($row['evento'], ENT_QUOTES, 'UTF-8');
-$organizado_por = htmlspecialchars($row['organizado_por'], ENT_QUOTES, 'UTF-8');
+$evento = $row['evento'];
+$organizado_por = $row['organizado_por'];
 $destinos = $row['destinos'];
 $justificacion = $row['justificacion'];
 $ellasciudades =  $row['num_destinos'];

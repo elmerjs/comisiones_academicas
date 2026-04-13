@@ -169,7 +169,7 @@ if ($resultadores->num_rows > 0) {
     $res_encargo_vice = $row['res_encargo_vice'];
     $rector = $row['nombre_rector'];
     $tipo_rector = $row['tipo_rector'];
-    
+    $observacion = $row['observacion'];
     $sexo_tercero = $row['sexo_tercero'];
     $cargo_admin = $row['cargo_admin'];
     $nombre1 = $row['nombre1'];
@@ -215,18 +215,13 @@ if ($resultadores->num_rows > 0) {
 
 $trabajo = htmlspecialchars($row['nombre_trabajo'], ENT_QUOTES, 'UTF-8');
     
-if ($trabajo == null) {
-    $coneltrabajo = " como participante ";
-} else {
-     $coneltrabajo = " como ponente del trabajo  «".$trabajo."»";
-}
 $evento = htmlspecialchars($row['evento'], ENT_QUOTES, 'UTF-8');
 $organizado_por = htmlspecialchars($row['organizado_por'], ENT_QUOTES, 'UTF-8');
     $destinos = $row['destinos'];
 $justificacion = $row['justificacion'];
 
 if (empty($justificacion)) {
-    $justificacion = "lo que permitirá impactar de manera positiva en los procesos de formación académica del departamento al cual pertenece";
+    $justificacion = "lo que permitirá impactar de manera positiva los procesos de formación académica del departamento al cual pertenece";
 }$ellasciudades =  $row['num_destinos'];
 if ($ellasciudades == 1) {
     $endestinos = "en la ciudad de ";
@@ -542,13 +537,13 @@ if ($tipo_rector == 'Rector') {
     $textRun->addText($el_la,  array('size' => 12));
         $textRun->addText('RECTOR DE LA UNIVERSIDAD DEL CAUCA', array('bold' => true,'size' => 12));
     
-                $textRun->addText(' en uso de sus competencias establecidas en el Artículo 23 del Acuerdo Superior 105 de 1993 o Estatuto General de la Universidad del Cauca, modificado por el Acuerdo Superior 025 de 2020, y',  array('size' => 12));
+                $textRun->addText(' en uso de sus competencias establecidas en el Artículo 23 del Acuerdo Superior 105 de 1993, Estatuto General de la Universidad del Cauca, modificado por el Acuerdo Superior 025 de 2020, y',  array('size' => 12));
 
     } else{
        
         $textRun->addText($el_la,  array('size' => 12));
         $textRun->addText( $parrafo2r, array('bold' => true,  'size' => 12));
-        $textRun->addText(' en uso de sus competencias establecidas en el Artículo 23 del Acuerdo Superior 105 de 1993 o Estatuto General de la Universidad del Cauca, modificado por el Acuerdo Superior 025 de 2020,  conforme a la ' . $resol_encargo_rector . ', y',  array('size' => 12));
+        $textRun->addText(' en uso de sus competencias establecidas en el Artículo 23 del Acuerdo Superior 105 de 1993, Estatuto General de la Universidad del Cauca, modificado por el Acuerdo Superior 025 de 2020,  conforme a la ' . $resol_encargo_rector . ', y',  array('size' => 12));
 }
      // Añadir el título centrado
     
@@ -576,12 +571,16 @@ $textRun->addText(', y presentar al Consejo Superior la solicitud de concesión 
     }
     
         
+// Normalizamos la variable para que no falle por espacios o minúsculas
+$cargo_buscado = trim(strtoupper($cargo_admin));
+
+    if (in_array($cargo_buscado, ['JEFE', 'DECANO', 'DIRECTOR', 'COORDINADOR', 'RECTOR', 'VICERRECTOR'])) {
+        $paragraphStyle = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH, 'spaceAfter' => 150);
+        $textRun = $section->addTextRun($paragraphStyle);
+        $textRun->addText('Mediante Acuerdo Superior 047 de 2022 se delegó en el Rector de la Universidad, la función de autorizar las comisiones al exterior de los profesores universitarios que ejercen cargos de administración académica.', array('size' => 12));
+    }
         
-      $paragraphStyle = array('alignment' => Jc::BOTH, 'spaceAfter' => 150);
-    $textRun = $section->addTextRun($paragraphStyle);
-     $textRun->addText('Mediante Acuerdo Superior 047 de 2022, delegó en el Rector de la Universidad, la función de autorizar las comisiones al exterior de los profesores universitarios que ejercen cargos de administración académica.',  array('size' => 12));
-    
-      $paragraphStyle = array('alignment' => Jc::BOTH, 'spaceAfter' => 150);
+    $paragraphStyle = array('alignment' => Jc::BOTH, 'spaceAfter' => 150);
     $textRun = $section->addTextRun($paragraphStyle);
      $textRun->addText('El Consejo Superior, mediante comunicado 2.1-1.39/119 del 20 de diciembre de 2022, recomendó prever controles en la autorización de las comisiones, con miras a verificar y articular los objetos de las comisiones académicas con los objetivos misionales y estratégicos, procurando además, por la rigurosidad en la aprobación de apoyos con efecto presupuestal.',  array('size' => 12));
     
@@ -604,12 +603,34 @@ $textRun->addText('.',  array('size' => 12));
 $paragraphStyle = array('alignment' => Jc::BOTH, 'spaceAfter' => 150);
 $textRun = $section->addTextRun($paragraphStyle);
 
-$textRun->addText('El Consejo de la ' . $facultad_min . ', en sesión del día ' . $fecha_letras_aval . ', avaló la Comisión Académica al exterior ' . $saludode . ' ',  array('size' => 12));
-$textRun->addText($nombre_profesor, array('bold' => true,  'size' => 12));
-$textRun->addText(', ',  array('size' => 12));
-$textRun->addText($identificado . ' con la cédula de ciudadanía número ',  array('size' => 12));
-$textRun->addText($documento_tercero, array('bold' => true,  'size' => 12));
-$textRun->addText(', ' . $adscrito . ' al departamento de ' . $depto_nom_propio . '.',  array('size' => 12));
+// 1. Normalizamos la búsqueda de la palabra "referendum" (sin importar mayúsculas/minúsculas)
+$esReferendum = (mb_stripos($observacion, 'referendum') !== false);
+
+$paragraphStyle = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH, 'spaceAfter' => 150);
+$textRun = $section->addTextRun($paragraphStyle);
+
+if ($esReferendum) {
+    // --- CASO A: SI ES AD-REFERÉNDUM ---
+    $textRun->addText('El presidente del Consejo de la ' . $facultad_min . ', avaló ', array('size' => 12));
+    $textRun->addText('ad-referéndum ', array('size' => 12, 'italic' => true, 'bold' => true));
+    $textRun->addText('la comisión académica al exterior ' . $saludode . ' ', array('size' => 12));
+    $textRun->addText($nombre_profesor, array('bold' => true, 'size' => 12));
+    $textRun->addText(', ' . $identificado . ' con la cédula de ciudadanía número ', array('size' => 12));
+    $textRun->addText($documento_tercero, array('bold' => true, 'size' => 12));
+    $textRun->addText(', ' . $adscrito . ' al departamento de ' . $depto_nom_propio . ', ', array('size' => 12));
+    
+    // Aquí usamos la variable de la sesión programada (ajusta el nombre de la variable si es distinto)
+    $textRun->addText('sujeta a la formalización por parte del Consejo en la sesión programada para el día ' . $fecha_letras_aval . '.', array('size' => 12));
+
+} else {
+    // --- CASO B: PÁRRAFO NORMAL (ACTA DE SESIÓN) ---
+    $textRun->addText('El Consejo de la ' . $facultad_min . ', en sesión del día ' . $fecha_letras_aval . ', avaló la comisión académica al exterior ' . $saludode . ' ', array('size' => 12));
+    $textRun->addText($nombre_profesor, array('bold' => true, 'size' => 12));
+    $textRun->addText(', ', array('size' => 12));
+    $textRun->addText($identificado . ' con la cédula de ciudadanía número ', array('size' => 12));
+    $textRun->addText($documento_tercero, array('bold' => true, 'size' => 12));
+    $textRun->addText(', ' . $adscrito . ' al departamento de ' . $depto_nom_propio . '.', array('size' => 12));
+}
 
 
 
@@ -623,7 +644,15 @@ $textRun->addText('De conformidad con los documentos remitidos por el presidente
 
 $textRun->addText($saludode . ' ',  array('size' => 12));
 $textRun->addText($nombre_profesor, array('bold' => true,'size' => 12));
-$textRun->addText( $coneltrabajo . ' en ',  array('size' => 12));
+
+if (empty($trabajo)) {
+    $textRun->addText(' como participante en ', array('size' => 12));
+} else {
+    $textRun->addText(' como ponente del trabajo «', array('size' => 12));
+    $textRun->addText($trabajo, array('italic' => true, 'size' => 12)); // 👈 cursiva aquí
+    $textRun->addText('» en ', array('size' => 12));
+}
+
 $textRun->addText($evento, array('italic' => true,  'size' => 12));
 $textRun->addText(', organizado por ' . $organizado_por . ', ' . $endestinos . $destinos . '; ' . $justificacion . '.',  array('size' => 12));
 
@@ -638,7 +667,7 @@ $textRun->addText(' participe en la misión académica mencionada.', array('size
 // Nuevo párrafo solicitado
 $paragraphStyleJustified = array('alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH, 'spaceAfter' => 10);
 $textRun = $section->addTextRun($paragraphStyleJustified);
-$textRun->addText('Que la presente comisión académica se tramita con fundamento en la solicitud presentada por el docente mediante el formato correspondiente, debidamente avalado por el Consejo de Facultad, con base en la información y documentación aportados como soporte de la misma, los cuales se presumen auténticos y veraces en virtud del principio de buena fe que rige las actuaciones administrativas, limitándose esta dependencia a la revisión y análisis de la solicitud conforme a los documentos aportados.', array('size' => 12));
+$textRun->addText('Que la presente comisión académica se tramita con fundamento en la solicitud presentada por '. $saludo_el_la. ' mediante el formato correspondiente, debidamente avalado por el Consejo de Facultad, con base en la información y documentación aportadas como soporte de la misma, las cuales se presumen auténticas y veraces en virtud del principio de buena fe que rige las actuaciones administrativas, limitándose esta dependencia a la revisión y análisis de la solicitud conforme a los documentos aportados.', array('size' => 12));
 
 // Párrafo final
     $section->addTextBreak(0);

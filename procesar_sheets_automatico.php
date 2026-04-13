@@ -1,16 +1,20 @@
 <?php
-// Log de inicio
-$log_file = 'procesamiento.log';
+// 1. Definir ruta absoluta para el log (Solución al Permission Denied)
+$log_file = __DIR__ . '/procesamiento.log';
 $timestamp = date('Y-m-d H:i:s');
-file_put_contents($log_file, "=== INICIANDO PROCESO: $timestamp ===\n", FILE_APPEND);
+
+// Intentar escribir el log (el @ silencia el error si aún hubiera problemas de permiso)
+@file_put_contents($log_file, "=== INICIANDO PROCESO: $timestamp ===\n", FILE_APPEND);
 
 echo "=========================================\n";
 echo "🔄 PROCESADOR CON VERIFICACIÓN ESTRICTA DE LINKS\n";
 echo "📅 " . date('Y-m-d H:i:s') . "\n"; 
 echo "=========================================\n\n";
 
-header('Content-Type: text/plain; charset=utf-8');
-
+// 2. Solo enviar cabeceras si NO es consola (Evita el "Headers already sent")
+if (php_sapi_name() !== 'cli') {
+    header('Content-Type: text/plain; charset=utf-8');
+}
 // Configuración
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');

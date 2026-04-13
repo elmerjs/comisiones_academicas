@@ -1,154 +1,254 @@
 <?php
 include 'conn.php';
 
-// Manejar acciones de CRUD para rectores
+// Manejo de acciones (usando prepared statements)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['delete'])) {
+    // Eliminar
+    if (isset($_POST['delete_rector'])) {
         $rector_cc = $_POST['rector_cc'];
-        $conn->query("DELETE FROM rector WHERE rector_cc='$rector_cc'");
-    } elseif (isset($_POST['edit'])) {
-        // Manejar la edición
-        // Obtener los datos del rector a editar
+        $stmt = $conn->prepare("DELETE FROM rector WHERE rector_cc = ?");
+        $stmt->bind_param("s", $rector_cc);
+        $stmt->execute();
+        $stmt->close();
+    }
+    // Agregar
+    elseif (isset($_POST['add_rector'])) {
         $rector_cc = $_POST['rector_cc'];
-        $result = $conn->query("SELECT * FROM rector WHERE rector_cc='$rector_cc'");
-        if ($result && $result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            // Mostrar el formulario de edición
-            echo '<h3>Editar Rector</h3>';
-            echo '<form method="post">';
-            echo '<input type="hidden" name="rector_cc" value="' . $row['rector_cc'] . '">';
-            echo '<div class="form-group">';
-            echo '<label for="rector_nom_propio">Nombre Propio</label>';
-            echo '<input type="text" class="form-control" id="rector_nom_propio" name="rector_nom_propio" value="' . $row['rector_nom_propio'] . '">';
-            echo '</div>';
-            echo '<div class="form-group">';
-            echo '<label for="rector_sexo">Sexo</label>';
-            echo '<select class="form-control" id="rector_sexo" name="rector_sexo">';
-            echo '<option value="F" ' . ($row['rector_sexo'] == 'F' ? 'selected' : '') . '>F</option>';
-            echo '<option value="M" ' . ($row['rector_sexo'] == 'M' ? 'selected' : '') . '>M</option>';
-            echo '</select>';
-            echo '</div>';
-            echo '<div class="form-group">';
-            echo '<label for="rector_resol_encargo">Resol Encargo</label>';
-            echo '<input type="text" class="form-control" id="rector_resol_encargo" name="rector_resol_encargo" value="' . $row['rector_resol_encargo'] . '">';
-            echo '</div>';
-            
-            echo '<div class="form-group">';
-            echo '<label for="tipo_rector">Tipo Rector</label>';
-            echo '<input type="text" class="form-control" id="tipo_rector" name="tipo_rector" value="' . $row['tipo_rector'] . '">';
-            echo '</div>';
-            echo '<button type="submit" name="update" class="btn btn-primary">Actualizar</button>';
-            echo '</form>';
-        } else {
-            // Si no se encuentra el rector
-            echo "<p>No se encontró el rector con CC: $rector_cc</p>";
-        }
-    } elseif (isset($_POST['update'])) {
-        // Manejar la actualización
-        $rector_cc = $_POST['rector_cc'];
-        $rector_nombre = strtoupper($_POST['rector_nom_propio']);
+        $rector_nom_propio = strtoupper(trim($_POST['rector_nom_propio']));
         $rector_sexo = $_POST['rector_sexo'];
         $rector_resol_encargo = $_POST['rector_resol_encargo'];
-        $rector_nom_propio = $_POST['rector_nom_propio'];
         $tipo_rector = $_POST['tipo_rector'];
-        $conn->query("UPDATE rector SET rector_nombre='$rector_nombre', rector_sexo='$rector_sexo', rector_resol_encargo='$rector_resol_encargo', rector_nom_propio='$rector_nom_propio', tipo_rector='$tipo_rector' WHERE rector_cc='$rector_cc'");
-    } elseif (isset($_POST['add'])) {
-        // Agregar nuevos rectores
+        $stmt = $conn->prepare("INSERT INTO rector (rector_cc, rector_nombre, rector_nom_propio, rector_sexo, rector_resol_encargo, tipo_rector) VALUES (?, ?, ?, ?, ?, ?)");
+        $rector_nombre = $rector_nom_propio;
+        $stmt->bind_param("ssssss", $rector_cc, $rector_nombre, $rector_nom_propio, $rector_sexo, $rector_resol_encargo, $tipo_rector);
+        $stmt->execute();
+        $stmt->close();
+    }
+    // Actualizar (vía modal)
+    elseif (isset($_POST['update_rector'])) {
         $rector_cc = $_POST['rector_cc'];
-        $rector_nombre = strtoupper($_POST['rector_nom_propio']);
+        $rector_nom_propio = strtoupper(trim($_POST['rector_nom_propio']));
         $rector_sexo = $_POST['rector_sexo'];
         $rector_resol_encargo = $_POST['rector_resol_encargo'];
-        $rector_nom_propio = $_POST['rector_nom_propio'];
         $tipo_rector = $_POST['tipo_rector'];
-        $conn->query("INSERT INTO rector (rector_cc, rector_nombre, rector_sexo, rector_resol_encargo, rector_nom_propio, tipo_rector) VALUES ('$rector_cc', '$rector_nombre', '$rector_sexo', '$rector_resol_encargo', '$rector_nom_propio', '$tipo_rector')");
+        $stmt = $conn->prepare("UPDATE rector SET rector_nombre = ?, rector_nom_propio = ?, rector_sexo = ?, rector_resol_encargo = ?, tipo_rector = ? WHERE rector_cc = ?");
+        $rector_nombre = $rector_nom_propio;
+        $stmt->bind_param("ssssss", $rector_nombre, $rector_nom_propio, $rector_sexo, $rector_resol_encargo, $tipo_rector, $rector_cc);
+        $stmt->execute();
+        $stmt->close();
     }
 }
 
-// Consultar y mostrar rectores
-$result = $conn->query("SELECT * FROM rector");
+// Obtener todos los rectores
+$result = $conn->query("SELECT * FROM rector ORDER BY rector_nom_propio ASC");
 ?>
 
-<h2>Gestión de Rectores</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>CC</th>
-            <th>Nombre Propio</th>
-            <th>Sexo</th>
-            <th>Resol Encargo</th>
-            <th>Tipo Rector</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php while ($row = $result->fetch_assoc()): ?>
+<style>
+    .table-rectores th {
+        background-color: var(--azul-oscuro, #002A9E);
+        color: white;
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 12px 10px;
+        border: none;
+    }
+    .table-rectores td {
+        padding: 10px 8px;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--gris-border, #E9EEF3);
+    }
+    .btn-edit-rector {
+        background: #e9ecef;
+        color: #1e293b;
+        border: none;
+        border-radius: 30px;
+        padding: 4px 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+    .btn-edit-rector:hover {
+        background: var(--azul-cielo, #16A8E1);
+        color: white;
+    }
+    .btn-delete-rector {
+        background: #fee2e2;
+        color: var(--rojo, #E52724);
+        border: none;
+        border-radius: 30px;
+        padding: 4px 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+    .btn-delete-rector:hover {
+        background: var(--rojo, #E52724);
+        color: white;
+    }
+    .card-form-rector {
+        background: #F8FAFE;
+        border-radius: 20px;
+        padding: 1.2rem;
+        margin-top: 1.5rem;
+        border: 1px solid var(--gris-border);
+    }
+</style>
+
+<div class="table-responsive">
+    <table class="table table-hover table-rectores">
+        <thead>
             <tr>
-                <td><?= $row['rector_cc'] ?></td>
-                <td><?= $row['rector_nom_propio'] ?></td>
-                <td><?= $row['rector_sexo'] ?></td>
-                <td><?= $row['rector_resol_encargo'] ?></td>
-                <td><?= $row['tipo_rector'] ?></td>
-                <td>
-                    <!-- Formulario para editar/eliminar -->
-                    <form method="post" style="display:inline-block;">
-                        <input type="hidden" name="rector_cc" value="<?= $row['rector_cc'] ?>">
-<button type="submit" name="edit" class="btn btn-editar btn-sm">Editar</button>
-                        <button type="submit" name="delete" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </td>
+                <th>CC</th>
+                <th>Nombre Propio</th>
+                <th>Sexo</th>
+                <th>Resolución Encargo</th>
+                <th>Tipo Rector</th>
+                <th>Acciones</th>
             </tr>
-        <?php endwhile; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <?php if ($result && $result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['rector_cc']) ?></td>
+                        <td><?= htmlspecialchars($row['rector_nom_propio']) ?></td>
+                        <td><?= htmlspecialchars($row['rector_sexo']) ?></td>
+                        <td><?= htmlspecialchars($row['rector_resol_encargo']) ?></td>
+                        <td><?= htmlspecialchars($row['tipo_rector']) ?></td>
+                        <td>
+                            <button type="button" class="btn-edit-rector"
+                                    data-json='<?= json_encode([
+                                        'cc' => $row['rector_cc'],
+                                        'nombre' => $row['rector_nom_propio'],
+                                        'sexo' => $row['rector_sexo'],
+                                        'resol' => $row['rector_resol_encargo'],
+                                        'tipo' => $row['tipo_rector']
+                                    ]) ?>'>
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <form method="post" style="display: inline-block;" onsubmit="return confirm('¿Eliminar este rector?')">
+                                <input type="hidden" name="rector_cc" value="<?= $row['rector_cc'] ?>">
+                                <button type="submit" name="delete_rector" class="btn-delete-rector"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <tr><td colspan="6" class="text-center">No hay rectores registrados</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
-<!-- Formulario para agregar nuevo registro -->
-<h3>Agregar Nuevo Rector</h3>
-<form method="post">
-    <div class="form-group">
-        <label for="rector_cc">CC</label>
-        <input type="text" class="form-control" id="rector_cc" name="rector_cc">
+<!-- Modal para editar rector -->
+<div class="modal fade" id="editModalRector" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 24px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #002A9E, #4C19AF); color: white; border-radius: 24px 24px 0 0;">
+                <h5 class="modal-title"><i class="fas fa-user-edit"></i> Editar Rector</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">&times;</button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="rector_cc" id="edit_rector_cc">
+                    <div class="form-group">
+                        <label>Nombre Propio</label>
+                        <input type="text" class="form-control" name="rector_nom_propio" id="edit_rector_nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sexo</label>
+                        <select class="form-control" name="rector_sexo" id="edit_rector_sexo">
+                            <option value="F">Femenino</option>
+                            <option value="M">Masculino</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Resolución de Encargo</label>
+                        <input type="text" class="form-control" name="rector_resol_encargo" id="edit_rector_resol">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo Rector</label>
+                        <input type="text" class="form-control" name="tipo_rector" id="edit_rector_tipo">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="update_rector" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
     </div>
-   <div class="form-group">
-        <label for="rector_nom_propio">Nombre Propio</label>
-        <input type="text" class="form-control" id="rector_nom_propio" name="rector_nom_propio">
-    </div>
-    <div class="form-group">
-        <label for="rector_sexo">Sexo</label>
-        <select class="form-control" id="rector_sexo" name="rector_sexo">
-            <option value="F">F</option>
-            <option value="M">M</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="rector_resol_encargo">Resol Encargo</label>
-        <input type="text" class="form-control" id="rector_resol_encargo" name="rector_resol_encargo">
-    </div>
-   
-    <div class="form-group">
-        <label for="tipo_rector">Tipo Rector</label>
-        <input type="text" class="form-control" id="tipo_rector" name="tipo_rector">
-    </div>
-<!--<button type="submit" name="add_revisa" class="btn btn-agregar">Agregar</button>-->
-<button type="submit" name="add" class="btn btn-agregar">Agregar</button>
+</div>
 
-</form>
- <style>
-        /* Estilo personalizado para el botón "Editar" */
-        .btn-editar {
-            background-color: #1a1a4b !important; /* Azul oscuro */
-            color: white !important; /* Letra blanca */
+<!-- Formulario para agregar nuevo rector -->
+<div class="card-form-rector">
+    <h6 class="mb-3" style="color: var(--azul-oscuro); font-weight: 700;"><i class="fas fa-plus-circle"></i> Agregar Nuevo Rector</h6>
+    <form method="post">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label>CC</label>
+                <input type="text" class="form-control" name="rector_cc" required>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Nombre Propio</label>
+                <input type="text" class="form-control" name="rector_nom_propio" required>
+            </div>
+            <div class="form-group col-md-2">
+                <label>Sexo</label>
+                <select class="form-control" name="rector_sexo">
+                    <option value="F">Femenino</option>
+                    <option value="M">Masculino</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label>Resolución Encargo</label>
+                <input type="text" class="form-control" name="rector_resol_encargo">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Tipo Rector</label>
+                <input type="text" class="form-control" name="tipo_rector">
+            </div>
+            <div class="form-group col-md-2 d-flex align-items-end">
+                <button type="submit" name="add_rector" class="btn btn-primary" style="background: var(--verde); border-radius: 30px;"><i class="fas fa-save"></i> Agregar</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Delegación de eventos para el botón Editar (funciona incluso dentro de pestañas)
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.addEventListener('click', function(e) {
+        var btn = e.target.closest('.btn-edit-rector');
+        if (!btn) return;
+
+        var data = btn.getAttribute('data-json');
+        if (!data) {
+            alert('Error al cargar los datos del rector.');
+            return;
         }
 
-        .btn-editar:hover {
-            background-color: #000033 !important; /* Un azul más oscuro para el hover */
+        try {
+            var rector = JSON.parse(data);
+            document.getElementById('edit_rector_cc').value = rector.cc;
+            document.getElementById('edit_rector_nombre').value = rector.nombre;
+            document.getElementById('edit_rector_sexo').value = rector.sexo;
+            document.getElementById('edit_rector_resol').value = rector.resol;
+            document.getElementById('edit_rector_tipo').value = rector.tipo;
+
+            // Abrir modal usando jQuery o Bootstrap nativo
+            if (typeof $ !== 'undefined' && $.fn.modal) {
+                $('#editModalRector').modal('show');
+            } else if (typeof bootstrap !== 'undefined') {
+                var modal = new bootstrap.Modal(document.getElementById('editModalRector'));
+                modal.show();
+            } else {
+                alert('No se pudo abrir el modal. Verifique que Bootstrap esté cargado.');
+            }
+        } catch (err) {
+            console.error('Error al parsear JSON:', err);
+            alert('Error en los datos del rector.');
         }
-       /* Estilo personalizado para el botón "Agregar" */
-        .btn-agregar {
-            background-color: #800020   !important; /* Azul oscuro */
-            color: white !important; /* Letra blanca */
-        }
- 
-        .btn-agregar:hover {
-            background-color: #66001a s   !important; /* Un azul más oscuro para el hover */
-        }
-    </style>
+    });
+});
+</script>

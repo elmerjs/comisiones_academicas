@@ -1,9 +1,8 @@
-/* Destroy current user session */
-
 <?php
+ob_start(); // Limpia cualquier salida previa (por si acaso)
 session_start();
-session_unset(); // Elimina todas las variables de sesión
+session_unset();
 session_destroy();
-
-header('location: index.html');
+header('Location: index.html');
+exit;
 ?>

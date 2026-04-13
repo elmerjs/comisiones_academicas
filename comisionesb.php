@@ -13,11 +13,7 @@ SET  comision_academica.estado = 'finalizada'
 where comision_academica.estado = 'Activa'
 AND comision_academica.vence  < NOW()";
         
-if ($conn->query($sqlu) === TRUE) {
-  echo "actualizado";
-} else {
-  echo "Error: " . $sqlu . "<br>" . $conn->error;
-}
+
 
 
 
@@ -362,230 +358,281 @@ $result = $conn->query($sql);
 
 ?>
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comisiones Académicas</title>
+    <title>Comisiones Académicas · Unicauca</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-    /* Cambiar el color de los iconos */
-   
-    /* Estilo para el botón de informe */
-    .informe-btn {
-        background-color: transparent !important; /* Cambia este valor al color que desees */
-        border: 0px solid #111; /* Cambia este valor al color del contorno que desees */
-        border-radius: 5px; /* Agrega esquinas redondeadas al contorno si lo deseas */
-        padding: 5px 10px; /* Ajusta el relleno según sea necesario */
-        color: #111; /* Cambia este valor al color del texto que desees */
-        text-decoration: none; /* Elimina cualquier subrayado del texto */
-        cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
-    
-    
-    } th {
-        background-color: #060264; /* Fondo azul oscuro */
-        color: white; /* Texto blanco */
-        text-align: center; /* Centrar el texto */
-        margin: 0 5px; /* Espacio entre columnas */
-        padding: 10px 15px; /* Espacio interno */
-      /*  display: inline-block; /* Hacer que el espacio entre ellos funcione */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-    }
-    td {
-    background-color: #FCFCFC; /* Fondo gris muy tenue */
-    padding: 10px 15px; /* Espacio interno */
-            border: 1px solid #f5f5f5; /* Línea blanca entre campos */
-
-}   
-    
-    .icono-doc {
-    color: #2B579A; /* Color azul similar al de Word */
-}
-     .icono-informe {
-            color: darkred; /* Color naranja alusivo para informe */
+    <style>
+        /* ===== INSTITUTIONAL VARIABLES ===== */
+        :root {
+            --azul-oscuro: #002A9E;
+            --morado: #4C19AF;
+            --azul-rey: #0051C6;
+            --azul-cielo: #16A8E1;
+            --turquesa: #04B2B5;
+            --verde: #249337;
+            --verde-limon: #8CBD22;
+            --rojo: #E52724;
+            --naranja: #EC6C1F;
+            --amarillo: #F8AE15;
+            --gris-light: #F8FAFE;
+            --gris-border: #E9EEF3;
+            --shadow-card: 0 12px 28px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.02);
         }
-    .icono-editar {
-            color: #4CAF50; /* Color verde alusivo para editar */
-        }
-      .anular-btn {
-        padding: 2px 4px; /* Ajusta el padding para hacerlo más pequeño */
-        font-size: 0.75rem; /* Reduce el tamaño de la fuente */
-        line-height: 1.2; /* Ajusta la altura de la línea */
-        border-radius: 0.2rem; /* Ajusta el radio de las esquinas si es necesario */
-    }
-    /* Estilos para el modal de acciones */
-.action-card {
-    transition: all 0.2s ease-in-out;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    border: 1px solid #e9ecef;
-    cursor: pointer;
-}
-.action-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 20px rgba(0,0,0,0.1);
-    border-color: #c8a951;
-}
-.icon-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s;
-}
-.action-card:hover .icon-circle {
-    transform: scale(1.05);
-}
-#accionesModal .modal-content {
-    border-radius: 24px;
-}
-#accionesModal .modal-header {
-    border-bottom: none;
-}
-#accionesModal .modal-footer {
-    border-top: none;
-}
-#accionesModal .close {
-    font-size: 1.8rem;
-    font-weight: 300;
-    color: #6c757d;
-    opacity: 0.8;
-}
-#accionesModal .close:hover {
-    opacity: 1;
-}
-</style>
 
+        body {
+            background: #F1F5F9;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto;
+        }
+
+        /* Contenedor principal de la tabla */
+        .uc-page-wrapper {
+            background: white;
+            border-radius: 28px;
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+
+            /* CAMBIO CLAVE: Añadimos margen lateral para que no pegue a los bordes */
+            margin: 0 20px 2rem 20px; 
+
+            transition: all 0.2s;
+        }
+
+        /* Header interno del reporte */
+        .uc-card-header {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid var(--gris-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .uc-card-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--azul-oscuro), var(--morado));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .uc-badge-anio {
+            background: var(--azul-cielo);
+            color: white;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* Botones de exportación */
+        .uc-btn-xls, .uc-btn-aust {
+            border: none;
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .uc-btn-xls {
+            background: var(--verde);
+            color: white;
+        }
+        .uc-btn-xls:hover {
+            background: #1a6e2c;
+            transform: translateY(-2px);
+        }
+
+        .uc-btn-aust {
+            background: var(--verde-limon);
+            color: #2c3e2f;
+        }
+        .uc-btn-aust:hover {
+            background: #7aa51f;
+            color: white;
+        }
+
+        /* Tabla moderna */
+        .table {
+            margin: 0;
+            font-size: 0.85rem;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            background: var(--azul-oscuro);
+            color: white;
+            font-weight: 600;
+            padding: 14px 10px;
+            border-bottom: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .table tbody tr {
+            transition: background 0.2s;
+        }
+        .table tbody tr:hover {
+            background: #FEFCE8;
+        }
+        .table td {
+            padding: 12px 8px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--gris-border);
+            background-color: white;
+        }
+
+        /* Scroll horizontal suave */
+        .uc-table-scroll {
+            overflow-x: auto;
+            width: 100%;
+            scrollbar-width: thin;
+        }
+
+        /* Botón acciones moderno */
+        .acciones-btn {
+            background: #F1F5F9;
+            border: 1px solid #E2E8F0;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--azul-oscuro);
+            transition: all 0.2s;
+        }
+        .acciones-btn:hover {
+            background: var(--azul-cielo);
+            color: white;
+            border-color: var(--azul-cielo);
+        }
+
+        /* Modal acciones cards mejorado */
+        .action-card {
+            background: white;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            border: 1px solid #EDF2F7;
+        }
+        .action-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--azul-cielo);
+            box-shadow: 0 12px 22px rgba(0,0,0,0.08);
+        }
+        .icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 60px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #F1F5F9;
+        }
+
+        /* Estados abreviados */
+        .estado-badge {
+            display: inline-block;
+            background: #EFF6FF;
+            border-radius: 30px;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-<div id ="contenido">
-    <br>
- <?php if ($anio === 0): ?>
-        <h2>Comisiones Académicas</h2>
-    <?php else: ?>
-        <h2>Comisiones Académicas <?php echo $anio; ?></h2>
-    <?php endif; ?><table id="comisionesTable" class="table table-hover">
-        
-        <thead>
-        <tr>
-                <th style="width: 30px;">Id</th>
-            <th style="width: 290px;font-size: 14px;">Profesor</th>
-            <th style="width: 40px;font-size: 14px;">Periodo</th>
-            <th style="width: 30px;font-size: 14px;">INT/EXT</th>
-            <th style="width: 200px;font-size: 14px;">Depto</th>
-  <!-- <th style="width: 200px;font-size: 14px;">Evento</th> -->         
-            <th style="width: 100px;font-size: 14px;">Destino</th>
-           <!--  <th style="width: 200px;font-size: 14px;">Fechas</th> --> 
-            <th style="width: 60px;font-size: 14px;">#Res</th>
-            <!-- <th style="width: 20px;font-size: 14px;" class="text-center">Inform</th> -->
-            <th style="width: 50px;font-size: 14px;">Tramitó</th>
-            <th style="width: 30px;font-size: 14px;">Est</th>
-            <th style="width: 100px;" class="text-center">Acciones</th>
-
-        </tr>
-        </thead>
-        <tbody>
-        <?php
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                echo "<tr>";
-                
-                  $observacionx = $row["link_resolucion"];
-
-            // Extraer el enlace desde observacion
-            $link = '';
-           if (!empty($observacionx)) {  // Verifica si $observacion no está vacía
-            $link = $observacionx;  // Asigna el valor de $observacion a $link
-        }
-
-            // Crear el enlace HTML si se encuentra un enlace válido
-            if (!empty($link)) {
-                echo "<td style='font-size: 14px;'><a href='$link' target='_blank'>" . $row["id_comision"] . "</a></td>";
-            } else {
-                echo "<td style='font-size: 14px;'>" . $row["id_comision"] . "</td>";
-            }
-
-                
-             //   echo "<td style='font-size: 14px;'>". $row["id_comision"] . "</td>";
-echo "<td style='font-size: 14px;'>" . $row["documento_profesor"] . " - " . substr($row["apellido1"] . " " . substr($row["apellido1"], 0, 1) . ". " . $row["nombre1"]. " " . $row["nombre2"], 0, 20) . "</td>";
-
-             echo "<td style='font-size: 14px;'>" . $row["periodo_academico"] . "</td>";
-              echo "<td style='font-size: 14px;'>". $row["tipo_estudio"] . "</td>";
-              echo "<td style='font-size: 14px;'>" . substr($row["depto_nom_propio"], 0, 15) . " - " . $row["nombre_fac_min"] . "</td>";
-
-               // echo "<td style='font-size: 14px;'>" . substr($row["evento"], 0, 25) . "</td>";
-            //    echo "<td style='font-size: 14px;'>" . substr($row["ciudades_concat"], 0, 10) . "</td>";
-             
-                echo "<td style='font-size: 14px;' title='" . htmlspecialchars($row["evento"] . " - " . $row["fecha_formateada"], ENT_QUOTES) . "'>"
-    . substr($row["ciudades_concat"], 0, 10) . 
-    "</td>";
-                //  echo "<td style='font-size: 14px;'>". substr($row["fecha_formateada"], 0, 20) . "</td>";
-                //echo "<td style='font-size: 14px;' title='" . htmlspecialchars($row["evento"], ENT_QUOTES) . "'>"    . substr($row["fecha_formateada"], 0, 20) .     "</td>";
-if (!empty($link)) {
-    echo "<td style='font-size: 14px;'><a href='$link' target='_blank'>" . substr($row["No_resolucion"], 0, 20) . "</a></td>";
-} else {
-    echo "<td style='font-size: 14px;'>" . substr($row["No_resolucion"], 0, 20) . "</td>";
-}                
-        //echo "<td style='font-size: 14px;'class='text-center'>". ($row["reintegrado"] == 1 ? '✓' : '✗') . "</td>";
-                echo "<td style='font-size: 14px;'>" . substr($row["tramito"], 0, 6) . "</td>";
-// Definir las abreviaciones para cada estado
-$estado_abreviado = '';
-switch ($row["estado_comision"]) {
-    case 'finalizada':
-        $estado_abreviado = 'fn';
-        break;
-    case 'Activa':
-        $estado_abreviado = 'ac';
-        break;
-    case 'anulada':
-        $estado_abreviado = 'an';
-        break;
-    default:
-        $estado_abreviado = ''; // Vacío para cualquier otro estado
-        break;
-}
-
-// Mostrar el estado abreviado con el estilo apropiado
-echo "<td style='font-size: 14px; color:" . ($row["estado_comision"] == "anulada" ? "red" : "black") . ";'>" . $estado_abreviado . "</td>";
-
-$tipo_estudio = $row['tipo_estudio'];
-$id_comision = $row['id_comision'];
-   // Icono de editar
-$link_editar = "actualizar_formacion.php?id={$id_comision}";
-$icon_editar = '<i class="fas fa-pencil-alt icono-editar"></i>'; // Agregamos la clase "icono-editar" al icono
-// Después de mostrar el estado (línea donde se muestra $estado_abreviado)
-$tipo_estudio = $row['tipo_estudio'];
-$id_comision = $row['id_comision'];
-$no_resolucion = $row["No_resolucion"];
-$fecha_resolucion = $row["fecha_resolucion"];
-
-echo "<td class='text-center'>
-        <button type='button' class='btn btn-sm btn-outline-secondary acciones-btn' 
-                data-id='{$id_comision}'
-                data-tipo='{$tipo_estudio}'
-                data-no-resolucion='".htmlspecialchars($no_resolucion)."'
-                data-fecha-resolucion='{$fecha_resolucion}'
-                data-toggle='modal' 
-                data-target='#accionesModal'>
-            <i class='fas fa-ellipsis-h'></i> Acciones
-        </button>
-      </td>";
-                echo "</tr>";
-            }
-        }
-        ?>
-        </tbody>
-    </table>
-    <button type="button" class="btn" style="background-color: #217346; color: white;" data-toggle="modal" data-target="#filterModal"><i class="fas fa-file-excel"></i> xls Comisiones Académicas</button>
-<button type="button" class="btn" style="background-color: blue; color: white;" data-toggle="modal" data-target="#filterModalb"><i class="fas fa-file-excel"></i> Reporte Austeridad</button>
+<div id="contenido">
+    <div class="uc-page-wrapper">
+        <div class="uc-card-header">
+            <h5 class="uc-card-title">
+                <i class="fas fa-chalkboard-user"></i> Comisiones Académicas
+                <?php if ($anio != 0): ?>
+                    <span class="uc-badge-anio"><?= htmlspecialchars($anio) ?></span>
+                <?php endif; ?>
+            </h5>
+            <div class="uc-header-actions">
+                <button type="button" class="btn uc-btn-xls" data-toggle="modal" data-target="#filterModal">
+                    <i class="fas fa-file-excel"></i> Reporte Comisiones
+                </button>
+                <button type="button" class="btn uc-btn-aust" data-toggle="modal" data-target="#filterModalb">
+                    <i class="fas fa-chart-line"></i> Austeridad
+                </button>
+            </div>
+        </div>
+        <div class="uc-table-scroll">
+            <table id="comisionesTable" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th><th>Profesor</th><th>Periodo</th><th>INT/EXT</th>
+                        <th>Depto</th><th>Destino</th><th>#Res</th><th>Tramitó</th><th>Est</th><th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $observacionx = $row["link_resolucion"];
+                        $link = !empty($observacionx) ? $observacionx : '';
+                        echo "<tr>";
+                        // ID con enlace si existe resolución
+                        if (!empty($link)) {
+                            echo "<td><a href='$link' target='_blank' class='fw-bold' style='color:var(--azul-rey)'>" . $row["id_comision"] . "</a></td>";
+                        } else {
+                            echo "<td>" . $row["id_comision"] . "</td>";
+                        }
+                        echo "<td>" . $row["documento_profesor"] . " - " . substr($row["apellido1"] . " " . substr($row["apellido1"],0,1) . ". " . $row["nombre1"]. " " . $row["nombre2"], 0, 25) . "</td>";
+                        echo "<td>" . $row["periodo_academico"] . "</td>";
+                        echo "<td>" . $row["tipo_estudio"] . "</td>";
+                        echo "<td>" . substr($row["depto_nom_propio"], 0, 15) . " - " . $row["nombre_fac_min"] . "</td>";
+                        echo "<td title='" . htmlspecialchars($row["evento"] . " - " . $row["fecha_formateada"], ENT_QUOTES) . "'>" . substr($row["ciudades_concat"], 0, 10) . "</td>";
+                        if (!empty($link)) {
+                            echo "<td><a href='$link' target='_blank'>" . substr($row["No_resolucion"], 0, 20) . "</a></td>";
+                        } else {
+                            echo "<td>" . substr($row["No_resolucion"], 0, 20) . "</td>";
+                        }
+                        echo "<td>" . substr($row["tramito"], 0, 6) . "</td>";
+                        $estado_abreviado = '';
+                        switch ($row["estado_comision"]) {
+                            case 'finalizada': $estado_abreviado = 'fn'; break;
+                            case 'Activa': $estado_abreviado = 'ac'; break;
+                            case 'anulada': $estado_abreviado = 'an'; break;
+                            default: $estado_abreviado = '';
+                        }
+                        $color_estado = ($row["estado_comision"] == "anulada") ? "var(--rojo)" : "var(--verde)";
+                        echo "<td style='color:$color_estado; font-weight:600;'>" . strtoupper($estado_abreviado) . "</td>";
+                        echo "<td class='text-center'>
+                                <button class='btn acciones-btn' data-id='{$row["id_comision"]}' data-tipo='{$row["tipo_estudio"]}'
+                                    data-no-resolucion='".htmlspecialchars($row["No_resolucion"])."'
+                                    data-fecha-resolucion='{$row["fecha_resolucion"]}' data-toggle='modal' data-target='#accionesModal'>
+                                    <i class='fas fa-ellipsis-h'></i> Acciones
+                                </button>
+                              </td>";
+                        echo "</tr>";
+                    }
+                } ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- Modal -->
@@ -619,91 +666,115 @@ echo "<td class='text-center'>
     </div>
 </div>
 <!-- Modal de acciones unificadas -->
-<!-- Modal de acciones unificadas (versión mejorada UX) -->
+<!-- Modal de acciones unificadas - Versión profesional Unicauca -->
 <div class="modal fade" id="accionesModal" tabindex="-1" role="dialog" aria-labelledby="accionesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="accionesModalLabel">
-                    <i class="fas fa-cog me-2 text-primary"></i>Acciones de la comisión
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 28px; overflow: hidden;">
+            <!-- Header con gradiente institucional -->
+            <div class="modal-header" style="background: linear-gradient(135deg, #002A9E 0%, #4C19AF 100%); border-bottom: none; padding: 1.2rem 1.8rem;">
+                <h5 class="modal-title fw-bold text-white" id="accionesModalLabel">
+                    <i class="fas fa-cog me-2"></i> Acciones de la comisión
                 </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 0.8;">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body pt-0">
-                <div class="row g-4 text-center mt-2">
+            <!-- Body con tarjetas de acción -->
+            <div class="modal-body" style="padding: 2rem 1.5rem 1.5rem 1.5rem;">
+                <div class="row g-3 text-center">
                     <!-- Editar -->
                     <div class="col-6 col-md-3">
-                        <a href="#" id="modalEditar" class="action-card d-block p-3 rounded-4 text-decoration-none">
-                            <div class="icon-circle mx-auto mb-2" style="background-color: #e9f0ff;">
-                                <i class="fas fa-pencil-alt fa-2x" style="color: #1a2a4a;"></i>
+                        <a href="#" id="modalEditar" class="action-card d-block p-3 rounded-4 text-decoration-none transition-all">
+                            <div class="icon-circle mx-auto mb-3" style="width: 56px; height: 56px; background: #EFF6FF; border-radius: 60px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                <i class="fas fa-pencil-alt fa-2x" style="color: #002A9E;"></i>
                             </div>
-                            <span class="fw-semibold">Editar</span>
+                            <span class="fw-semibold" style="color: #1E293B; font-size: 0.85rem;">Editar</span>
                         </a>
                     </div>
                     <!-- Resolución Individual -->
                     <div class="col-6 col-md-3">
-                        <a href="#" id="modalResInd" class="action-card d-block p-3 rounded-4 text-decoration-none">
-                            <div class="icon-circle mx-auto mb-2" style="background-color: #fff5e6;">
-                                <i class="far fa-file-word fa-2x" style="color: #c8a951;"></i>
+                        <a href="#" id="modalResInd" class="action-card d-block p-3 rounded-4 text-decoration-none transition-all">
+                            <div class="icon-circle mx-auto mb-3" style="width: 56px; height: 56px; background: #FEFCE8; border-radius: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="far fa-file-word fa-2x" style="color: #8CBD22;"></i>
                             </div>
-                            <span class="fw-semibold">Res. Individual</span>
+                            <span class="fw-semibold" style="color: #1E293B; font-size: 0.85rem;">Res. Individual</span>
                         </a>
                     </div>
                     <!-- Resolución Multi (párrafo) -->
                     <div class="col-6 col-md-3">
-                        <a href="#" id="modalResMultiP" class="action-card d-block p-3 rounded-4 text-decoration-none">
-                            <div class="icon-circle mx-auto mb-2" style="background-color: #fff5e6;">
-                                <i class="fas fa-layer-group fa-2x" style="color: #c8a951;"></i>
+                        <a href="#" id="modalResMultiP" class="action-card d-block p-3 rounded-4 text-decoration-none transition-all">
+                            <div class="icon-circle mx-auto mb-3" style="width: 56px; height: 56px; background: #FEFCE8; border-radius: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-layer-group fa-2x" style="color: #8CBD22;"></i>
                             </div>
-                            <span class="fw-semibold">Res. Multi (párrafo)</span>
+                            <span class="fw-semibold" style="color: #1E293B; font-size: 0.85rem;">Res. Multi (párrafo)</span>
                         </a>
                     </div>
                     <!-- Resolución Multi (tabla) -->
                     <div class="col-6 col-md-3">
-                        <a href="#" id="modalResMultiT" class="action-card d-block p-3 rounded-4 text-decoration-none">
-                            <div class="icon-circle mx-auto mb-2" style="background-color: #fff5e6;">
-                                <i class="fas fa-table fa-2x" style="color: #c8a951;"></i>
+                        <a href="#" id="modalResMultiT" class="action-card d-block p-3 rounded-4 text-decoration-none transition-all">
+                            <div class="icon-circle mx-auto mb-3" style="width: 56px; height: 56px; background: #FEFCE8; border-radius: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-table fa-2x" style="color: #8CBD22;"></i>
                             </div>
-                            <span class="fw-semibold">Res. Multi (tabla)</span>
+                            <span class="fw-semibold" style="color: #1E293B; font-size: 0.85rem;">Res. Multi (tabla)</span>
                         </a>
                     </div>
                     <!-- Subir Informe -->
                     <div class="col-6 col-md-3">
-                        <button type="button" id="modalSubirInforme" class="action-card w-100 p-3 rounded-4 text-decoration-none border-0 bg-transparent">
-                            <div class="icon-circle mx-auto mb-2" style="background-color: #e6f4ea;">
-                                <i class="fas fa-file-signature fa-2x" style="color: #2d6a4f;"></i>
+                        <button type="button" id="modalSubirInforme" class="action-card w-100 p-3 rounded-4 text-decoration-none border-0 bg-transparent transition-all">
+                            <div class="icon-circle mx-auto mb-3" style="width: 56px; height: 56px; background: #E6F4EA; border-radius: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-file-signature fa-2x" style="color: #249337;"></i>
                             </div>
-                            <span class="fw-semibold">Subir informe</span>
+                            <span class="fw-semibold" style="color: #1E293B; font-size: 0.85rem;">Subir informe</span>
                         </button>
                     </div>
                     <!-- Anular -->
                     <div class="col-6 col-md-3">
-                        <button type="button" id="modalAnular" class="action-card w-100 p-3 rounded-4 text-decoration-none border-0 bg-transparent">
-                            <div class="icon-circle mx-auto mb-2" style="background-color: #ffe6e6;">
-                                <i class="fas fa-ban fa-2x" style="color: #dc3545;"></i>
+                        <button type="button" id="modalAnular" class="action-card w-100 p-3 rounded-4 text-decoration-none border-0 bg-transparent transition-all">
+                            <div class="icon-circle mx-auto mb-3" style="width: 56px; height: 56px; background: #FEE2E2; border-radius: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-ban fa-2x" style="color: #E52724;"></i>
                             </div>
-                            <span class="fw-semibold">Anular</span>
+                            <span class="fw-semibold" style="color: #1E293B; font-size: 0.85rem;">Anular</span>
                         </button>
                     </div>
                     <!-- Clonar -->
                     <div class="col-6 col-md-3">
-                        <button type="button" id="modalClonar" class="action-card w-100 p-3 rounded-4 text-decoration-none border-0 bg-transparent">
-                            <div class="icon-circle mx-auto mb-2" style="background-color: #e9f0ff;">
-                                <i class="fas fa-clone fa-2x" style="color: #0d6efd;"></i>
+                        <button type="button" id="modalClonar" class="action-card w-100 p-3 rounded-4 text-decoration-none border-0 bg-transparent transition-all">
+                            <div class="icon-circle mx-auto mb-3" style="width: 56px; height: 56px; background: #EFF6FF; border-radius: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-clone fa-2x" style="color: #0051C6;"></i>
                             </div>
-                            <span class="fw-semibold">Clonar</span>
+                            <span class="fw-semibold" style="color: #1E293B; font-size: 0.85rem;">Clonar</span>
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-dismiss="modal">Cerrar</button>
+            <!-- Footer simplificado -->
+            <div class="modal-footer border-0 pt-0 pb-4" style="justify-content: center;">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-5" data-dismiss="modal" style="font-size: 0.8rem; border-color: #E2E8F0; color: #475569;">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Estilos adicionales para las tarjetas de acción (añadir al <style> de comisionesb.php) -->
+<style>
+    .action-card {
+        transition: all 0.25s ease-in-out;
+        background-color: #ffffff;
+        border: 1px solid #E9EEF3;
+        cursor: pointer;
+    }
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px -8px rgba(0,0,0,0.1);
+        border-color: #C8A951;
+    }
+    .action-card:hover .icon-circle {
+        transform: scale(1.05);
+    }
+    .transition-all {
+        transition: all 0.2s ease;
+    }
+</style>
 <!-- Modal de filtros -->
 <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document" style="width: 80%;">
@@ -852,14 +923,24 @@ function confirmarClonacion(comisionId) {
 }
 
 $(document).ready(function() {
-    // Inicializar DataTable
-    $('#comisionesTable').DataTable({
+    // 1. Inicializar DataTable asignándolo a una variable y agregando autoWidth: false
+    var table = $('#comisionesTable').DataTable({
         "order": [],
         "columnDefs": [
             { "targets": 0, "visible": false }
         ],
-        "stateSave": true
+        "stateSave": true,
+        "autoWidth": false // Ayuda a que las columnas se ajusten al nuevo contenedor
     });
+
+    // 2. Escuchar el evento 'resize' disparado desde el menú lateral para ajustar las columnas
+    window.addEventListener('resize', function() {
+        if (table) {
+            table.columns.adjust().draw();
+        }
+    });
+
+    // --- El resto de tu código queda exactamente igual ---
 
     // Modal de acciones
     $('#accionesModal').on('show.bs.modal', function (event) {
@@ -870,7 +951,7 @@ $(document).ready(function() {
         var fechaResolucion = button.data('fecha-resolucion');
 
         var linkEditar = 'actualizar_formacion.php?id=' + id;
-        var linkResInd = (tipo === 'EXT') ? 'resolucion_doc_ext.php?id=' + id : 'resolucion_docb.php?id=' + id;
+        var linkResInd = (tipo === 'EXT') ? 'resolucion_doc_ext_b.php?id=' + id : 'resolucion_docc.php?id=' + id;
         var linkResMultiP = 'resolucion_docc_grupal.php?no_resolucion=' + encodeURIComponent(noResolucion) + '&fecha_resolucion=' + encodeURIComponent(fechaResolucion);
         var linkResMultiT = 'resolucion_docc_grupal_t.php?no_resolucion=' + encodeURIComponent(noResolucion) + '&fecha_resolucion=' + encodeURIComponent(fechaResolucion);
 
